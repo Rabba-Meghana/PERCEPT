@@ -504,7 +504,12 @@ const DiagnosisEngine: React.FC = () => {
         },
         (token, node) => {
           const k = node === 'Ingest' ? 'ingest' : node === 'Behavioral' ? 'behavioral' : 'diagnosis';
-          setNodeContent(c => ({ ...c, [k]: c[k as keyof typeof c] + token }));
+          if (k === 'diagnosis') {
+            // Don't stream raw JSON — show progress indicator instead
+            setNodeContent(c => ({ ...c, diagnosis: 'Parsing behavioral signals and classifying root cause...' }));
+          } else {
+            setNodeContent(c => ({ ...c, [k]: c[k as keyof typeof c] + token }));
+          }
         }
       );
       setNodeStatus({ ingest: 'done', behavioral: 'done', diagnosis: 'done' });
@@ -652,63 +657,198 @@ const DiagnosisEngine: React.FC = () => {
         {/* ══ STEP 3 ══ */}
         {selectedListing && (
           <div className="neu-raised-sm" style={{ padding: '22px 24px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 22 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 26 }}>
               <div style={{ width: 28, height: 28, borderRadius: '50%', background: 'linear-gradient(145deg,#D8D0E8,#9888B8)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '3px 3px 8px rgba(152,136,184,0.4)', flexShrink: 0 }}>
                 <span style={{ fontSize: '0.73rem', fontWeight: 800, color: 'white' }}>3</span>
               </div>
-              <div>
+              <div style={{ flex: 1 }}>
                 <span style={{ fontSize: '0.92rem', fontWeight: 600, color: 'var(--text-dark)' }}>Run Diagnosis</span>
-                <span style={{ fontSize: '0.75rem', color: 'var(--text-light)', marginLeft: 8 }}>LangGraph pipeline — 3 nodes streaming live</span>
+                <span style={{ fontSize: '0.75rem', color: 'var(--text-light)', marginLeft: 8 }}>LangGraph · 3 nodes · live stream</span>
               </div>
+              <button className="btn btn-blue" style={{ padding: '11px 28px', fontSize: '0.88rem', fontWeight: 600 }}
+                onClick={runAnalysis} disabled={running || !propertyInput.trim()}>
+                {running
+                  ? <><div style={{ width: 13, height: 13, border: '2px solid rgba(255,255,255,0.3)', borderTopColor: 'white', borderRadius: '50%', animation: 'spin-slow 0.8s linear infinite' }} /> Diagnosing...</>
+                  : <>Run Diagnosis <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></>
+                }
+              </button>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.2fr', gap: 24 }}>
+            {diagError && (
+              <div style={{ marginBottom: 20, padding: '12px 16px', background: 'rgba(200,128,128,0.10)', borderRadius: 'var(--r-md)', border: '1px solid rgba(200,128,128,0.22)' }}>
+                <div style={{ fontSize: '0.68rem', fontWeight: 700, color: '#C88080', marginBottom: 4 }}>⚠ Diagnosis Error</div>
+                <p style={{ fontSize: '0.74rem', color: 'var(--text-mid)', margin: 0 }}>{diagError}</p>
+              </div>
+            )}
 
-              {/* Left — inputs */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-                <div>
-                  <label style={{ fontSize: '0.65rem', fontWeight: 700, letterSpacing: '0.07em', color: 'var(--text-light)', textTransform: 'uppercase', display: 'block', marginBottom: 7 }}>Property Details</label>
-                  <textarea className="input-neu" value={propertyInput} onChange={e => setPropertyInput(e.target.value)}
-                    placeholder="Address, beds/baths, sqft, listed price, days on market..." rows={4} />
-                </div>
-                <div>
-                  <label style={{ fontSize: '0.65rem', fontWeight: 700, letterSpacing: '0.07em', color: 'var(--text-light)', textTransform: 'uppercase', display: 'block', marginBottom: 7 }}>Behavioral Signals</label>
-                  <textarea className="input-neu" value={behavioralInput} onChange={e => setBehavioralInput(e.target.value)}
-                    placeholder="CTR, inquiry rate, save rate, time on listing, price drops, lead photo..." rows={4} />
-                </div>
-                <div>
-                  <label style={{ fontSize: '0.65rem', fontWeight: 700, letterSpacing: '0.07em', color: 'var(--text-light)', textTransform: 'uppercase', display: 'block', marginBottom: 7 }}>Market Context</label>
-                  <textarea className="input-neu" value={marketInput} onChange={e => setMarketInput(e.target.value)}
-                    placeholder="Comps, demand velocity, FMV gap, vacancy risk..." rows={3} />
-                </div>
-                <button className="btn btn-blue" style={{ width: '100%', justifyContent: 'center', padding: '14px 20px', fontSize: '0.90rem', fontWeight: 600 }}
-                  onClick={runAnalysis} disabled={running || !propertyInput.trim()}>
-                  {running
-                    ? <><div style={{ width: 14, height: 14, border: '2px solid rgba(255,255,255,0.3)', borderTopColor: 'white', borderRadius: '50%', animation: 'spin-slow 0.8s linear infinite' }} /> Diagnosing...</>
-                    : <>Run Diagnosis <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></>
-                  }
-                </button>
+            {/* ── TWO COLUMN LAYOUT ── */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.15fr', gap: 22, alignItems: 'start' }}>
 
-                {diagError && (
-                  <div style={{ padding: '12px 16px', background: 'rgba(200,128,128,0.10)', borderRadius: 'var(--r-md)', border: '1px solid rgba(200,128,128,0.22)' }}>
-                    <div style={{ fontSize: '0.68rem', fontWeight: 700, color: '#C88080', marginBottom: 4 }}>⚠ Diagnosis Error</div>
-                    <p style={{ fontSize: '0.74rem', color: 'var(--text-mid)', margin: 0, lineHeight: 1.5 }}>{diagError}</p>
+              {/* ══ LEFT: VISUAL SIGNAL PANEL ══ */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+
+                {/* Property identity card */}
+                <div style={{ padding: '16px 18px', background: 'linear-gradient(145deg,rgba(122,170,190,0.10),rgba(122,170,190,0.04))', borderRadius: 'var(--r-lg)', border: '1px solid rgba(122,170,190,0.20)', boxShadow: '4px 4px 10px var(--neu-sd), -3px -3px 8px var(--neu-sl)' }}>
+                  <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 10, marginBottom: 14 }}>
+                    <div>
+                      <div style={{ fontSize: '0.65rem', fontWeight: 700, letterSpacing: '0.08em', color: '#7AAABE', textTransform: 'uppercase', marginBottom: 4 }}>Selected Unit</div>
+                      <div style={{ fontSize: '1.05rem', fontWeight: 700, color: 'var(--text-dark)', lineHeight: 1.2 }}>${selectedListing.listedPrice.toLocaleString()}<span style={{ fontSize: '0.68rem', fontWeight: 400, color: 'var(--text-light)' }}>/mo</span></div>
+                      <div style={{ fontSize: '0.72rem', color: 'var(--text-mid)', marginTop: 3 }}>{selectedListing.beds}bd · {selectedListing.baths}ba · {selectedListing.sqft.toLocaleString()} sqft</div>
+                    </div>
+                    <div style={{ textAlign: 'right' }}>
+                      <div style={{ fontSize: '0.62rem', color: 'var(--text-light)', marginBottom: 3 }}>{selectedListing.daysOnMarket}d on market</div>
+                      {selectedListing.priceDropCount > 0 && <div style={{ fontSize: '0.62rem', color: '#C88080', fontWeight: 600 }}>↓ {selectedListing.priceDropCount} price drop{selectedListing.priceDropCount > 1 ? 's' : ''}</div>}
+                      <div style={{ fontSize: '0.62rem', color: 'var(--text-light)', marginTop: 3 }}>{selectedListing.neighborhood}</div>
+                    </div>
                   </div>
-                )}
+                  {/* FMV gap bar */}
+                  <div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 5 }}>
+                      <span style={{ fontSize: '0.62rem', color: 'var(--text-light)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em' }}>vs Estimated FMV</span>
+                      <span style={{ fontSize: '0.70rem', fontWeight: 700, color: Math.abs(selectedListing.listedPrice - selectedListing.estimatedFMV) / selectedListing.estimatedFMV > 0.06 ? '#C88080' : '#7AAA88' }}>
+                        {selectedListing.listedPrice >= selectedListing.estimatedFMV ? '+' : ''}{((selectedListing.listedPrice - selectedListing.estimatedFMV) / selectedListing.estimatedFMV * 100).toFixed(1)}%
+                      </span>
+                    </div>
+                    <div style={{ height: 6, borderRadius: 100, background: 'var(--sand-dark)', position: 'relative', overflow: 'hidden' }}>
+                      <div style={{ position: 'absolute', left: '50%', top: 0, height: '100%', width: `${Math.min(Math.abs(selectedListing.listedPrice - selectedListing.estimatedFMV) / selectedListing.estimatedFMV * 300, 50)}%`, background: selectedListing.listedPrice >= selectedListing.estimatedFMV ? 'linear-gradient(90deg,#D4A870,#C88060)' : 'linear-gradient(90deg,#7AAABE,#7AAA88)', borderRadius: 100 }} />
+                      <div style={{ position: 'absolute', left: '50%', top: -2, bottom: -2, width: 2, background: 'var(--text-mid)', opacity: 0.3 }} />
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 3 }}>
+                      <span style={{ fontSize: '0.58rem', color: 'var(--text-light)' }}>Below FMV</span>
+                      <span style={{ fontSize: '0.58rem', color: 'var(--text-light)' }}>FMV</span>
+                      <span style={{ fontSize: '0.58rem', color: 'var(--text-light)' }}>Above FMV</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Signal heatmap */}
+                <div style={{ padding: '16px 18px', background: 'var(--neu-bg)', borderRadius: 'var(--r-lg)', boxShadow: '5px 5px 14px var(--neu-sd), -4px -4px 10px var(--neu-sl)' }}>
+                  <div style={{ fontSize: '0.63rem', fontWeight: 700, letterSpacing: '0.09em', color: 'var(--text-light)', textTransform: 'uppercase', marginBottom: 14 }}>Behavioral Signal Heatmap</div>
+                  {[
+                    { label: 'Click-Through Rate', val: selectedListing.ctr, bench: 0.45, key: 'ctr' },
+                    { label: 'Inquiry Rate',       val: selectedListing.inquiryRate, bench: 0.28, key: 'inq' },
+                    { label: 'Save Rate',          val: selectedListing.saveRate, bench: 0.18, key: 'save' },
+                    { label: 'Tour Conversion',    val: selectedListing.tourConversion, bench: 0.32, key: 'tour' },
+                    { label: 'Demand Velocity',    val: selectedListing.demandVelocity, bench: 0.65, key: 'vel' },
+                    { label: 'Vacancy Risk',       val: 1 - selectedListing.vacancyRisk, bench: 0.5, key: 'vac' },
+                  ].map(sig => {
+                    const pct = Math.round(sig.val * 100);
+                    const benchPct = Math.round(sig.bench * 100);
+                    const ratio = sig.val / sig.bench;
+                    const heat = ratio > 1.3 ? '#7AAA88' : ratio > 0.85 ? '#A8C4B0' : ratio > 0.6 ? '#D4A870' : '#C88080';
+                    const heatBg = ratio > 1.3 ? 'rgba(122,170,136,0.12)' : ratio > 0.85 ? 'rgba(168,196,176,0.10)' : ratio > 0.6 ? 'rgba(212,168,112,0.12)' : 'rgba(200,128,128,0.10)';
+                    return (
+                      <div key={sig.key} style={{ marginBottom: 10 }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+                          <span style={{ fontSize: '0.68rem', color: 'var(--text-mid)', fontWeight: 500 }}>{sig.label}</span>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                            <span style={{ fontSize: '0.60rem', color: 'var(--text-light)' }}>avg {benchPct}%</span>
+                            <div style={{ padding: '1px 8px', borderRadius: 100, background: heatBg, border: `1px solid ${heat}44` }}>
+                              <span style={{ fontSize: '0.66rem', fontWeight: 700, color: heat }}>{pct}%</span>
+                            </div>
+                          </div>
+                        </div>
+                        <div style={{ height: 8, borderRadius: 100, background: 'var(--sand-dark)', position: 'relative', overflow: 'visible' }}>
+                          <div style={{ position: 'absolute', top: 0, left: 0, height: '100%', width: `${pct}%`, background: `linear-gradient(90deg,${heat}66,${heat})`, borderRadius: 100, transition: 'width 0.9s cubic-bezier(0.34,1.56,0.64,1)', maxWidth: '100%' }} />
+                          <div style={{ position: 'absolute', top: -3, bottom: -3, left: `${benchPct}%`, width: 2, background: 'var(--text-mid)', borderRadius: 1, opacity: 0.35 }} />
+                        </div>
+                      </div>
+                    );
+                  })}
+                  {/* Lead photo flag */}
+                  {selectedListing.leadPhotoType === 'bathroom' && (
+                    <div style={{ marginTop: 12, padding: '8px 12px', background: 'rgba(200,128,128,0.10)', borderRadius: 'var(--r-md)', border: '1px solid rgba(200,128,128,0.25)', display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <span style={{ fontSize: '0.85rem' }}>⚠️</span>
+                      <div>
+                        <div style={{ fontSize: '0.65rem', fontWeight: 700, color: '#C88080' }}>BATHROOM LEAD PHOTO DETECTED</div>
+                        <div style={{ fontSize: '0.60rem', color: 'var(--text-light)' }}>Suppresses inquiry rate 30–40% vs living room lead</div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* CTR vs Inquiry gap gauge */}
+                <div style={{ padding: '16px 18px', background: 'var(--neu-bg)', borderRadius: 'var(--r-lg)', boxShadow: '5px 5px 14px var(--neu-sd), -4px -4px 10px var(--neu-sl)' }}>
+                  <div style={{ fontSize: '0.63rem', fontWeight: 700, letterSpacing: '0.09em', color: 'var(--text-light)', textTransform: 'uppercase', marginBottom: 14 }}>Perception Gap Analysis</div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 14 }}>
+                    {/* CTR circle */}
+                    <div style={{ flex: 1, textAlign: 'center' }}>
+                      <svg viewBox="0 0 80 80" width="80" height="80" style={{ display: 'block', margin: '0 auto' }}>
+                        <circle cx="40" cy="40" r="32" fill="none" stroke="var(--sand-dark)" strokeWidth="8"/>
+                        <circle cx="40" cy="40" r="32" fill="none" stroke="#7AAABE" strokeWidth="8"
+                          strokeDasharray={`${Math.round(selectedListing.ctr * 201)} 201`}
+                          strokeLinecap="round" transform="rotate(-90 40 40)" style={{ transition: 'stroke-dasharray 1s ease' }}/>
+                        <text x="40" y="44" textAnchor="middle" fontSize="14" fontWeight="700" fill="var(--text-dark)">{Math.round(selectedListing.ctr * 100)}%</text>
+                      </svg>
+                      <div style={{ fontSize: '0.62rem', color: 'var(--text-light)', marginTop: 4, fontWeight: 600 }}>CTR</div>
+                    </div>
+                    {/* Gap arrow */}
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
+                      <div style={{ fontSize: '0.70rem', fontWeight: 800, color: Math.round((selectedListing.ctr - selectedListing.inquiryRate) * 100) > 20 ? '#C88080' : '#7AAA88' }}>
+                        {Math.round((selectedListing.ctr - selectedListing.inquiryRate) * 100)}pp gap
+                      </div>
+                      <svg width="32" height="12" viewBox="0 0 32 12"><path d="M0 6h28M22 1l6 5-6 5" stroke={Math.round((selectedListing.ctr - selectedListing.inquiryRate) * 100) > 20 ? '#C88080' : '#7AAA88'} strokeWidth="2" fill="none" strokeLinecap="round"/></svg>
+                      <div style={{ fontSize: '0.58rem', color: 'var(--text-light)', textAlign: 'center', maxWidth: 60 }}>
+                        {Math.round((selectedListing.ctr - selectedListing.inquiryRate) * 100) > 20 ? 'Trust break' : 'Healthy'}
+                      </div>
+                    </div>
+                    {/* Inquiry circle */}
+                    <div style={{ flex: 1, textAlign: 'center' }}>
+                      <svg viewBox="0 0 80 80" width="80" height="80" style={{ display: 'block', margin: '0 auto' }}>
+                        <circle cx="40" cy="40" r="32" fill="none" stroke="var(--sand-dark)" strokeWidth="8"/>
+                        <circle cx="40" cy="40" r="32" fill="none" stroke="#9888B8" strokeWidth="8"
+                          strokeDasharray={`${Math.round(selectedListing.inquiryRate * 201)} 201`}
+                          strokeLinecap="round" transform="rotate(-90 40 40)" style={{ transition: 'stroke-dasharray 1s ease' }}/>
+                        <text x="40" y="44" textAnchor="middle" fontSize="14" fontWeight="700" fill="var(--text-dark)">{Math.round(selectedListing.inquiryRate * 100)}%</text>
+                      </svg>
+                      <div style={{ fontSize: '0.62rem', color: 'var(--text-light)', marginTop: 4, fontWeight: 600 }}>Inquiry Rate</div>
+                    </div>
+                  </div>
+                  {/* Market comp sparkline */}
+                  <div style={{ paddingTop: 12, borderTop: '1px solid var(--sand-dark)' }}>
+                    <div style={{ fontSize: '0.61rem', color: 'var(--text-light)', marginBottom: 8, fontWeight: 600 }}>COMP PRICE POSITION</div>
+                    <div style={{ display: 'flex', alignItems: 'flex-end', gap: 3, height: 36 }}>
+                      {[0.78, 0.82, 0.91, 1.0, 1.04, 1.08, 1.15].map((v, i) => {
+                        const isThis = i === 3;
+                        const h = Math.round(v * 36);
+                        return (
+                          <div key={i} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
+                            <div style={{ width: '100%', height: h, borderRadius: '4px 4px 2px 2px', background: isThis ? 'linear-gradient(180deg,#7AAABE,#5A8AA0)' : 'var(--sand-dark)', transition: 'height 0.7s ease', boxShadow: isThis ? '0 2px 8px rgba(122,170,190,0.4)' : 'none' }} />
+                            {isThis && <div style={{ fontSize: '0.52rem', color: '#7AAABE', fontWeight: 700, whiteSpace: 'nowrap' }}>THIS</div>}
+                          </div>
+                        );
+                      })}
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 4 }}>
+                      <span style={{ fontSize: '0.56rem', color: 'var(--text-light)' }}>Cheapest</span>
+                      <span style={{ fontSize: '0.56rem', color: 'var(--text-light)' }}>Priciest</span>
+                    </div>
+                  </div>
+                </div>
+
               </div>
 
-              {/* Right — pipeline + result */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 18, minWidth: 0 }}>
+              {/* ══ RIGHT: PIPELINE + VERDICT ══ */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 16, minWidth: 0 }}>
+
                 {/* Pipeline */}
-                <div style={{ padding: '20px 22px', background: 'var(--neu-bg)', borderRadius: 'var(--r-lg)', boxShadow: '5px 5px 14px var(--neu-sd), -4px -4px 10px var(--neu-sl)' }}>
-                  <div style={{ fontSize: '0.65rem', fontWeight: 700, letterSpacing: '0.09em', color: 'var(--text-light)', textTransform: 'uppercase', marginBottom: 20 }}>LangGraph Pipeline — Live</div>
+                <div style={{ padding: '18px 20px', background: 'var(--neu-bg)', borderRadius: 'var(--r-lg)', boxShadow: '5px 5px 14px var(--neu-sd), -4px -4px 10px var(--neu-sl)' }}>
+                  <div style={{ fontSize: '0.63rem', fontWeight: 700, letterSpacing: '0.09em', color: 'var(--text-light)', textTransform: 'uppercase', marginBottom: 18 }}>LangGraph Pipeline — Live</div>
                   <NodeStep number={1} label="Ingest Node"     sublabel="parse & structure signals"    status={nodeStatus.ingest}     content={nodeContent.ingest}     color="#7AAABE" />
                   <NodeStep number={2} label="Behavioral Node" sublabel="identify conversion failure"  status={nodeStatus.behavioral} content={nodeContent.behavioral} color="#7AAA88" />
                   <NodeStep number={3} label="Diagnosis Node"  sublabel="classify root cause & action" status={nodeStatus.diagnosis}  content={nodeContent.diagnosis}  color="#9888B8" isLast />
                 </div>
 
-                {/* Result */}
+                {/* Verdict */}
                 {result && <DiagnosisResultCard result={result} listing={selectedListing} />}
+
+                {/* Idle state */}
+                {!result && !running && (
+                  <div style={{ padding: '32px 24px', borderRadius: 'var(--r-lg)', border: '1.5px dashed var(--sand-dark)', textAlign: 'center', opacity: 0.55 }}>
+                    <div style={{ fontSize: '1.8rem', marginBottom: 10 }}>🧠</div>
+                    <div style={{ fontSize: '0.78rem', color: 'var(--text-light)', lineHeight: 1.6 }}>Hit Run Diagnosis to stream all 3 nodes live<br/>and receive a full root-cause verdict</div>
+                  </div>
+                )}
               </div>
             </div>
           </div>
