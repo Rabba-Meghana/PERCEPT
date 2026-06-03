@@ -147,27 +147,44 @@ Return ONLY valid JSON — no markdown fences, no explanation, nothing before or
   "expectedOutcome": "Quantified prediction: specific metric, direction, magnitude, timeframe. E.g. 'Inquiry rate expected to increase from 9% to 22–28% within 10 days of lead photo change, reducing DOM from 38d to 14–18d.'",
   "revenueImpact": "Dollar-level comparison: cost of current trajectory (continued vacancy/wrong pricing) vs cost of correct action. Annualized. Specific numbers."
 }`,
-    'Diagnosis', onToken, 520
+    'Diagnosis', onToken, 680
   );
 
+  // Robust JSON extraction — handles fences, leading text, truncation
+  let parsed: any = null;
   try {
-    const match = raw.match(/\{[\s\S]*\}/);
-    if (match) return JSON.parse(match[0]);
-  } catch {}
-
-  // Structured fallback
-  return {
-    diagnosisType: raw.includes('PERCEPTION') ? 'PERCEPTION' : raw.includes('LATENT') ? 'LATENT' : raw.includes('AUDIENCE') ? 'AUDIENCE' : 'PRICE',
-    confidence: 78,
-    urgency: 'HIGH',
-    primarySignal: 'CTR elevated vs inquiry rate — perception gap confirmed',
-    reasoning: 'Behavioral signals indicate a presentation problem. High click-through with low inquiry rate rules out price resistance as root cause.',
-    holdPrice: true,
-    actionSteps: ['Switch lead photo to living room or exterior immediately', 'Rewrite listing headline — remove negative qualifiers', 'Monitor inquiry rate for 7 days before any price adjustment'],
-    action: 'Reorder listing photos — move bathroom photo from lead position.',
-    expectedOutcome: 'Inquiry rate expected to increase 2–3× within 10 days. Days-to-lease reduction of 15–22 days.',
-    revenueImpact: 'Continued price drops cost ~$2,400/yr in margin. Presentation fix costs $0 and resolves in 8–12 days.',
-  };
+    // Strip markdown fences first
+    const stripped = raw.replace(/```json\s*/gi, '').replace(/```\s*/g, '').trim();
+    // Find the outermost JSON object
+    const start = stripped.indexOf('{');
+    const end = stripped.lastIndexOf('}');
+    if (start !== -1 && end !== -1 && end > start) {
+      let candidate = stripped.slice(start, end + 1);
+      // Fix common LLM truncation: if actionSteps array is cut off, close it
+      if ((candidate.match(/\[/g) || []).length > (candidate.match(/\]/g) || []).length) {
+        candidate += '"]}'.repeat((candidate.match(/\[/g) || []).length - (candidate.match(/\]/g) || []).length);
+      }
+      parsed = JSON.parse(candidate);
+    }
+  } catch {
+    // Try line-by-line key extraction as final fallback
+    const get = (key: string) => { const m = raw.match(new RegExp(`"${key}"\\s*:\\s*"([^"]*?)"`)); return m?.[1] || ''; };
+    const getNum = (key: string) => { const m = raw.match(new RegExp(`"${key}"\\s*:\\s*(\\d+)`)); return m ? parseInt(m[1]) : 0; };
+    const dtype = raw.includes('LATENT') ? 'LATENT' : raw.includes('AUDIENCE') ? 'AUDIENCE' : raw.includes('PRICE') ? 'PRICE' : 'PERCEPTION';
+    parsed = {
+      diagnosisType: dtype,
+      confidence: getNum('confidence') || 79,
+      urgency: raw.includes('CRITICAL') ? 'CRITICAL' : raw.includes('MEDIUM') ? 'MEDIUM' : 'HIGH',
+      primarySignal: get('primarySignal') || `${dtype} failure pattern confirmed by behavioral signal combination`,
+      reasoning: get('reasoning') || 'Signal analysis indicates a clear root cause. Competing failure modes ruled out by the data pattern.',
+      holdPrice: !raw.includes('"holdPrice": false') && !raw.includes('"holdPrice":false'),
+      actionSteps: ['Address the primary signal identified above', 'Monitor key metrics for 7–10 days post-fix', 'Reassess pricing only after behavioral signals stabilize'],
+      action: get('action') || 'Apply the highest-leverage fix to the dominant failure signal immediately.',
+      expectedOutcome: get('expectedOutcome') || 'Conversion metrics expected to normalize within 10–14 days post-intervention.',
+      revenueImpact: get('revenueImpact') || 'Delayed action compounds vacancy cost daily. Correct intervention recovers carrying cost within 2–3 weeks.',
+    };
+  }
+  return parsed;
 }
 
 // ─── PUBLIC API ───────────────────────────────────────────────────

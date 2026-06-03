@@ -510,13 +510,20 @@ const DiagnosisEngine: React.FC = () => {
         (token, node) => {
           const k = node === 'Ingest' ? 'ingest' : node === 'Behavioral' ? 'behavioral' : 'diagnosis';
           if (k === 'diagnosis') {
-            setNodeContent(c => ({ ...c, diagnosis: 'Classifying root cause — parsing behavioral pattern matrix...' }));
+            // Show accumulating JSON tokens as a live "thinking" indicator — count chars received
+            setNodeContent(c => {
+              const current = c.diagnosis;
+              const len = current.replace(/[^{}",:]/g, '').length;
+              const phases = ['Parsing behavioral signals...', 'Running differential diagnosis...', 'Classifying root cause...', 'Computing confidence score...', 'Building action plan...'];
+              return { ...c, diagnosis: phases[Math.min(Math.floor(len / 8), phases.length - 1)] };
+            });
           } else {
             setNodeContent(c => ({ ...c, [k]: c[k as keyof typeof c] + token }));
           }
         }
       );
       setNodeStatus({ ingest: 'done', behavioral: 'done', diagnosis: 'done' });
+      setNodeContent(c => ({ ...c, diagnosis: res.primarySignal || 'Root cause classified.' }));
       setResult(res);
     } catch (err: any) {
       setNodeStatus({ ingest: 'idle', behavioral: 'idle', diagnosis: 'idle' });
