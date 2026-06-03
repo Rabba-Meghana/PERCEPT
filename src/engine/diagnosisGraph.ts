@@ -79,52 +79,75 @@ async function streamGroq(
 // ─── NODE 1: INGEST ──────────────────────────────────────────────
 async function runIngestNode(p: string, b: string, m: string, onToken: (t: string, n: string) => void) {
   return streamGroq(
-    `You are PERCEPT's data ingestion analyst. Synthesize this property data into a sharp analyst brief.
+    `You are PERCEPT's senior data analyst. Synthesize this property data into a precise quant brief.
 
 PROPERTY: ${p}
 BEHAVIORAL SIGNALS: ${b}
 MARKET CONTEXT: ${m}
 
-Write exactly 3 sentences. Sentence 1: state the most anomalous signal with exact numbers. Sentence 2: describe the FMV gap and days-on-market position relative to market median. Sentence 3: flag the most suspicious data pattern and what it implies. Tone: senior quant analyst — precise, cold, no hedging, no filler words.`,
-    'Ingest', onToken, 280
+Write exactly 3 sentences. NO generic statements. Use exact numbers from the data.
+Sentence 1: State the single most anomalous signal — the one number that stands out most sharply versus its benchmark or market average. Be precise (e.g. "CTR of 74% sits 29 points above the 45% portfolio benchmark, yet inquiry rate of 9% is 19 points below the 28% floor").
+Sentence 2: Describe the FMV gap and DOM position in cold dollar terms relative to market median — include the actual dollar spread and what that means for daily carry cost.
+Sentence 3: Identify the most suspicious pattern — a combination of signals that points toward a specific failure mode. State what it implies without naming the diagnosis yet.
+Tone: forensic analyst. No hedging. No soft language. Every number cited must come from the input data.`,
+    'Ingest', onToken, 320
   );
 }
 
 // ─── NODE 2: BEHAVIORAL ANALYSIS ─────────────────────────────────
 async function runBehavioralNode(summary: string, onToken: (t: string, n: string) => void) {
   return streamGroq(
-    `You are PERCEPT's behavioral pattern engine. Identify the exact conversion failure mechanism.
+    `You are PERCEPT's behavioral conversion engine. Identify the precise failure mechanism.
 
 INGEST SUMMARY: ${summary}
 
-Analyze these signal tensions:
-• CTR vs inquiry rate → perception gap: high CTR + low inquiry = trust breaks before contact, NOT a price issue
-• Save rate vs tour conversion → latent demand: high saves + low tours = demand crystallizing, hold or raise
-• DOM vs price drop count → misdiagnosis loop: repeated price drops without fixing root cause = compounding value destruction
-• Lead photo type → presentation signal: bathroom lead photo suppresses inquiry rate 28–41% regardless of price
+Apply differential diagnosis across these four failure modes:
 
-State the dominant conversion failure mechanism in one direct sentence with the exact metrics that confirm it. Then explain what this pattern rules out. 3 sentences total. Zero hedging.`,
-    'Behavioral', onToken, 300
+PERCEPTION FAILURE: CTR high (>58%) but inquiry rate low (<18%). The listing generates clicks but trust collapses before contact. Root cause is nearly always presentation — lead photo type, negative copy framing, or misleading headline. Price is irrelevant to this failure; dropping it changes nothing.
+
+PRICE RESISTANCE: Uniform low engagement across CTR, inquiry, save rate, and tour conversion simultaneously. No behavioral anomalies. Multiple comps absorbing below this price point. Demand velocity negative. Clean, unambiguous ceiling.
+
+AUDIENCE MISALIGNMENT: Mixed signals where individual metrics look almost-but-not-quite right. Tour conversion is reasonable but CTR is weak. Traffic is arriving from the wrong renter profile — budget segment clicking on a premium listing, or wrong neighborhood cluster. Price is correct; distribution is wrong.
+
+LATENT DEMAND: Save rate and time-on-listing are elevated. CTR is solid. Inquiry lags but not dramatically. Renters are in deep consideration, not bouncing. The listing can hold or raise — demand is crystallizing toward a decision.
+
+In exactly 3 sentences: (1) name which failure mode is dominant and cite the specific signal combination that confirms it, (2) explain what the data explicitly rules out and why, (3) quantify the conversion gap — how far the actual metric sits from the threshold that would indicate a different diagnosis. Zero hedging. Zero repetition of the ingest summary.`,
+    'Behavioral', onToken, 340
   );
 }
 
 // ─── NODE 3: DIAGNOSIS ───────────────────────────────────────────
 async function runDiagnosisNode(analysis: string, property: string, onToken: (t: string, n: string) => void) {
   const raw = await streamGroq(
-    `You are PERCEPT's root cause diagnosis engine. Classify failure type and prescribe exact intervention.
+    `You are PERCEPT's root cause diagnosis engine. Classify and prescribe.
 
 BEHAVIORAL ANALYSIS: ${analysis}
 PROPERTY: ${property}
 
-DIAGNOSIS TYPES — choose exactly one:
-- PERCEPTION: CTR ≥58%, inquiry <18%. Renter sees listing, interest drops before contact. Fix presentation (photo order, copy). Do NOT drop price.
-- PRICE: Low engagement across all signals. True price ceiling. Comps absorb demand below this price point.
-- AUDIENCE: Mixed metrics, wrong renter IQ. Distribution problem. Fix targeting, not price.
-- LATENT: High save rate, high time-on-listing, moderate CTR. Demand crystallizing. Hold or raise price.
+DIAGNOSIS TYPES:
+- PERCEPTION: CTR ≥58% + inquiry <18%. Never drop the price. Fix the presentation first.
+- PRICE: Uniform low engagement. Comps absorb at lower price point. Drop price to market ceiling.
+- AUDIENCE: Mixed metrics, correct price, wrong traffic profile. Fix targeting and distribution tags.
+- LATENT: High save rate + time-on-listing + positive demand velocity. Hold or raise price.
 
-Return ONLY valid JSON, no markdown, no backticks, no explanation before or after:
-{"diagnosisType":"PERCEPTION","confidence":89,"urgency":"HIGH","primarySignal":"CTR 74% vs inquiry 11% — 63-point gap confirms perception break, not price resistance","reasoning":"Two precise sentences explaining this diagnosis with specific numbers and why it rules out other types.","holdPrice":true,"actionSteps":["Step 1 — specific action with timeline","Step 2 — specific action","Step 3 — specific measurable checkpoint"],"action":"The single most important thing to do right now, in one sentence.","expectedOutcome":"Quantified outcome: what improves, by how much, in what timeframe.","revenueImpact":"Specific dollar comparison: cost of wrong action (continued price drops) vs correct action (presentation fix). Annualized."}`,
-    'Diagnosis', onToken, 480
+Return ONLY valid JSON — no markdown fences, no explanation, nothing before or after the JSON:
+{
+  "diagnosisType": "PERCEPTION",
+  "confidence": 91,
+  "urgency": "HIGH",
+  "primarySignal": "One sentence. Cite specific numbers. State exactly what the dominant signal combination is and why it points to this diagnosis exclusively.",
+  "reasoning": "Two sentences. Sentence 1: explain the mechanism — why this specific combination of metrics produces this outcome. Sentence 2: state what competing diagnoses were ruled out and what data point eliminates each. Be precise and use actual numbers from the input.",
+  "holdPrice": true,
+  "actionSteps": [
+    "Step 1 — the single highest-leverage action. Be specific: not 'improve photos' but 'move lead photo from bathroom to living room or exterior — bathroom leads suppress inquiry rate 30–40% across comparable urban units'",
+    "Step 2 — second action with specific timeline or metric threshold to hit",
+    "Step 3 — checkpoint: specific measurable signal to watch and what movement indicates the fix is working"
+  ],
+  "action": "One sentence. The single most important action to take right now. Specific and actionable.",
+  "expectedOutcome": "Quantified prediction: specific metric, direction, magnitude, timeframe. E.g. 'Inquiry rate expected to increase from 9% to 22–28% within 10 days of lead photo change, reducing DOM from 38d to 14–18d.'",
+  "revenueImpact": "Dollar-level comparison: cost of current trajectory (continued vacancy/wrong pricing) vs cost of correct action. Annualized. Specific numbers."
+}`,
+    'Diagnosis', onToken, 520
   );
 
   try {

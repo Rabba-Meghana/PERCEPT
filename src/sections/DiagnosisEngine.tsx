@@ -546,28 +546,37 @@ const DiagnosisEngine: React.FC = () => {
                   <div style={{ fontSize: '0.70rem', color: 'var(--text-mid)' }}>Free at <a href="https://console.groq.com" target="_blank" rel="noopener noreferrer" style={{ color: '#7AAABE', fontWeight: 600 }}>console.groq.com</a> · Powers all 3 diagnosis nodes</div>
                 </div>
               </div>
-              <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
-                <input
-                  className="input-neu"
-                  type="text"
-                  value={apiKey}
-                  onChange={e => saveKey(e.target.value.trim())}
-                  placeholder="Paste your gsk_... key here"
-                  style={{ flex: 1, fontSize: '0.82rem', fontFamily: 'monospace', letterSpacing: '0.02em', color: 'var(--text-dark)' }}
-                  autoComplete="off"
-                  spellCheck={false}
-                />
-                <div style={{ fontSize: '0.68rem', color: 'var(--text-light)', flexShrink: 0, whiteSpace: 'nowrap' }}>Press Enter or start typing</div>
-              </div>
+              <input
+                className="input-neu"
+                type="text"
+                value={apiKey}
+                onChange={e => saveKey(e.target.value.trim())}
+                placeholder="Paste your gsk_... key here"
+                style={{ width: '100%', fontSize: '0.82rem', fontFamily: 'monospace', letterSpacing: '0.02em', color: 'var(--text-dark)' }}
+                autoComplete="off"
+                spellCheck={false}
+              />
             </div>
           ) : (
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 18px', background: 'rgba(122,170,136,0.09)', borderRadius: 'var(--r-md)', border: '1px solid rgba(122,170,136,0.25)' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#7AAA88', boxShadow: '0 0 6px #7AAA8866' }} />
+                <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#7AAA88', boxShadow: '0 0 6px #7AAA8866', flexShrink: 0 }} />
                 <span style={{ fontSize: '0.75rem', fontWeight: 600, color: '#4A7A58' }}>Groq API active</span>
-                <span style={{ fontSize: '0.68rem', color: 'var(--text-light)', fontFamily: 'monospace' }}>{apiKey.slice(0,12)}···{apiKey.slice(-4)}</span>
+                <span style={{ fontSize: '0.68rem', color: 'var(--text-light)', fontFamily: 'monospace' }}>{apiKey.slice(0,14)}···{apiKey.slice(-4)}</span>
               </div>
-              <button onClick={() => saveKey('')} style={{ background: 'rgba(200,128,128,0.10)', border: '1px solid rgba(200,128,128,0.22)', borderRadius: 8, cursor: 'pointer', fontSize: '0.68rem', color: '#C08080', padding: '3px 10px', fontWeight: 600 }}>Change key</button>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                <input
+                  className="input-neu"
+                  type="text"
+                  placeholder="Paste new key to replace"
+                  style={{ fontSize: '0.70rem', fontFamily: 'monospace', width: 220, padding: '5px 10px', color: 'var(--text-mid)' }}
+                  autoComplete="off"
+                  spellCheck={false}
+                  onPaste={e => { const v = e.clipboardData.getData('text').trim(); if (v.startsWith('gsk_')) { saveKey(v); e.preventDefault(); }}}
+                  onChange={e => { const v = e.target.value.trim(); if (v.startsWith('gsk_') && v.length > 20) saveKey(v); }}
+                />
+                <button onClick={() => saveKey('')} style={{ background: 'rgba(200,128,128,0.10)', border: '1px solid rgba(200,128,128,0.22)', borderRadius: 8, cursor: 'pointer', fontSize: '0.68rem', color: '#C08080', padding: '5px 12px', fontWeight: 600, whiteSpace: 'nowrap' }}>Clear key</button>
+              </div>
             </div>
           )}
         </div>
@@ -841,6 +850,87 @@ const DiagnosisEngine: React.FC = () => {
                     </div>
                   </div>
                 </div>
+
+                {/* Market comps table — appears after diagnosis */}
+                {result && marketData && (
+                  <div style={{ padding: '16px 18px', background: 'var(--neu-bg)', borderRadius: 'var(--r-lg)', boxShadow: '5px 5px 14px var(--neu-sd), -4px -4px 10px var(--neu-sl)' }}>
+                    <div style={{ fontSize: '0.63rem', fontWeight: 700, letterSpacing: '0.09em', color: 'var(--text-light)', textTransform: 'uppercase', marginBottom: 14 }}>Market Comp Table</div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 7 }}>
+                      {[...marketData.listings]
+                        .sort((a, b) => a.listedPrice - b.listedPrice)
+                        .map((l, i) => {
+                          const isThis = l.id === selectedListing?.id;
+                          const domFlag = l.daysOnMarket > marketData.avgDaysOnMarket * 1.4;
+                          return (
+                            <div key={i} style={{
+                              display: 'flex', alignItems: 'center', gap: 8, padding: '7px 10px',
+                              borderRadius: 'var(--r-md)',
+                              background: isThis ? 'rgba(122,170,190,0.12)' : 'transparent',
+                              border: isThis ? '1px solid rgba(122,170,190,0.28)' : '1px solid transparent',
+                            }}>
+                              <div style={{ fontSize: '0.60rem', color: 'var(--text-light)', width: 16, fontWeight: isThis ? 700 : 400 }}>{i + 1}</div>
+                              <div style={{ flex: 1, minWidth: 0 }}>
+                                <div style={{ fontSize: '0.67rem', fontWeight: isThis ? 700 : 500, color: isThis ? '#5A8AA0' : 'var(--text-dark)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                  {l.address.split(',')[0]}
+                                  {isThis && <span style={{ marginLeft: 5, fontSize: '0.55rem', fontWeight: 700, color: '#7AAABE', background: 'rgba(122,170,190,0.18)', padding: '1px 5px', borderRadius: 4 }}>THIS</span>}
+                                </div>
+                                <div style={{ fontSize: '0.59rem', color: 'var(--text-light)', marginTop: 1 }}>{l.beds}bd/{l.baths}ba · {l.sqft}sf</div>
+                              </div>
+                              <div style={{ textAlign: 'right', flexShrink: 0 }}>
+                                <div style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--text-dark)' }}>${l.listedPrice.toLocaleString()}</div>
+                                <div style={{ fontSize: '0.59rem', color: domFlag ? '#C88080' : 'var(--text-light)', fontWeight: domFlag ? 600 : 400 }}>{l.daysOnMarket}d{domFlag ? ' ⚠' : ''}</div>
+                              </div>
+                            </div>
+                          );
+                        })}
+                    </div>
+                    <div style={{ marginTop: 10, paddingTop: 10, borderTop: '1px solid var(--sand-dark)', display: 'flex', justifyContent: 'space-between' }}>
+                      <span style={{ fontSize: '0.60rem', color: 'var(--text-light)' }}>Market median</span>
+                      <span style={{ fontSize: '0.68rem', fontWeight: 700, color: 'var(--text-dark)' }}>${marketData.medianRent.toLocaleString()}/mo</span>
+                    </div>
+                  </div>
+                )}
+
+                {/* Revenue recovery calc — appears after diagnosis */}
+                {result && selectedListing && (
+                  <div style={{ padding: '16px 18px', background: 'linear-gradient(145deg,rgba(122,170,136,0.10),rgba(122,170,136,0.03))', borderRadius: 'var(--r-lg)', border: '1px solid rgba(122,170,136,0.22)', boxShadow: '4px 4px 10px var(--neu-sd), -3px -3px 8px var(--neu-sl)' }}>
+                    <div style={{ fontSize: '0.63rem', fontWeight: 700, letterSpacing: '0.09em', color: '#5A8A68', textTransform: 'uppercase', marginBottom: 14 }}>Revenue Recovery Estimate</div>
+                    {(() => {
+                      const vacancyDaysAtCurrent = selectedListing.daysOnMarket;
+                      const dailyCost = Math.round(selectedListing.listedPrice / 30);
+                      const estResolveDays = result.diagnosisType === 'PERCEPTION' ? 9 : result.diagnosisType === 'LATENT' ? 7 : result.diagnosisType === 'AUDIENCE' ? 12 : 5;
+                      const daysSaved = Math.max(0, vacancyDaysAtCurrent - estResolveDays);
+                      const recoverable = daysSaved * dailyCost;
+                      const annualized = result.diagnosisType === 'LATENT'
+                        ? Math.round((selectedListing.estimatedFMV - selectedListing.listedPrice) * 12)
+                        : recoverable * 4; // rough annualize
+                      const rows = [
+                        { label: 'Days on market', value: `${vacancyDaysAtCurrent}d`, flag: vacancyDaysAtCurrent > 20 },
+                        { label: 'Daily vacancy cost', value: `$${dailyCost}`, flag: false },
+                        { label: 'Est. resolution time', value: `${estResolveDays}d post-fix`, flag: false },
+                        { label: 'Recoverable days', value: `${daysSaved}d`, flag: daysSaved > 0 },
+                        { label: 'Immediate recovery', value: `$${recoverable.toLocaleString()}`, flag: recoverable > 500 },
+                      ];
+                      return (
+                        <>
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 12 }}>
+                            {rows.map(r => (
+                              <div key={r.label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                <span style={{ fontSize: '0.67rem', color: 'var(--text-light)' }}>{r.label}</span>
+                                <span style={{ fontSize: '0.71rem', fontWeight: 700, color: r.flag ? '#5A8A68' : 'var(--text-dark)' }}>{r.value}</span>
+                              </div>
+                            ))}
+                          </div>
+                          <div style={{ padding: '10px 14px', background: 'rgba(122,170,136,0.14)', borderRadius: 'var(--r-md)', border: '1px solid rgba(122,170,136,0.28)', textAlign: 'center' }}>
+                            <div style={{ fontSize: '0.60rem', fontWeight: 700, letterSpacing: '0.08em', color: '#5A8A68', marginBottom: 4 }}>ANNUALIZED LEAKAGE IF IGNORED</div>
+                            <div style={{ fontSize: '1.15rem', fontWeight: 800, color: '#3A6A48' }}>${Math.abs(annualized).toLocaleString()}</div>
+                            <div style={{ fontSize: '0.60rem', color: '#5A8A68', marginTop: 2 }}>recoverable with correct {result.diagnosisType === 'PERCEPTION' ? 'presentation fix' : result.diagnosisType === 'LATENT' ? 'price adjustment' : result.diagnosisType === 'AUDIENCE' ? 'targeting fix' : 'price reduction'}</div>
+                          </div>
+                        </>
+                      );
+                    })()}
+                  </div>
+                )}
 
               </div>
 
