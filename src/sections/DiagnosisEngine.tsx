@@ -548,7 +548,7 @@ const DiagnosisEngine: React.FC = () => {
             borderRadius: 'var(--r-lg)',
             border: `1.5px solid ${apiKey ? 'rgba(122,170,136,0.28)' : 'rgba(212,168,112,0.38)'}`,
             boxShadow: '4px 4px 12px var(--neu-sd), -3px -3px 9px var(--neu-sl)',
-            flexWrap: 'wrap', gap: 10,
+            flexWrap: 'wrap' as const,
           }}>
             <div style={{ width: 30, height: 30, borderRadius: 9, flexShrink: 0,
               background: apiKey ? 'linear-gradient(145deg,#90C898,#6AAA78)' : 'linear-gradient(145deg,#E8C870,#D4A840)',
