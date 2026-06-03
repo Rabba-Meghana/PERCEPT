@@ -542,50 +542,44 @@ const DiagnosisEngine: React.FC = () => {
 
         {/* ── Key Banner ── */}
         <div style={{ marginBottom: 28 }}>
-          {!apiKey ? (
-            <div style={{ padding: '20px 24px', background: 'rgba(212,168,112,0.13)', borderRadius: 'var(--r-lg)', border: '1.5px solid rgba(212,168,112,0.35)', boxShadow: '4px 4px 12px var(--neu-sd), -3px -3px 9px var(--neu-sl)' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
-                <div style={{ width: 32, height: 32, borderRadius: 10, background: 'linear-gradient(145deg,#E8C870,#D4A840)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '3px 3px 8px rgba(180,140,50,0.35)', flexShrink: 0 }}>
-                  <span style={{ fontSize: '1rem' }}>⚡</span>
-                </div>
-                <div>
-                  <div style={{ fontSize: '0.82rem', fontWeight: 700, color: '#8A6820' }}>Groq API Key Required</div>
-                  <div style={{ fontSize: '0.70rem', color: 'var(--text-mid)' }}>Free at <a href="https://console.groq.com" target="_blank" rel="noopener noreferrer" style={{ color: '#7AAABE', fontWeight: 600 }}>console.groq.com</a> · Powers all 3 diagnosis nodes</div>
-                </div>
+          <div style={{
+            display: 'flex', alignItems: 'center', gap: 10, padding: '12px 18px',
+            background: apiKey ? 'rgba(122,170,136,0.09)' : 'rgba(212,168,112,0.13)',
+            borderRadius: 'var(--r-lg)',
+            border: `1.5px solid ${apiKey ? 'rgba(122,170,136,0.28)' : 'rgba(212,168,112,0.38)'}`,
+            boxShadow: '4px 4px 12px var(--neu-sd), -3px -3px 9px var(--neu-sl)',
+            flexWrap: 'wrap', gap: 10,
+          }}>
+            <div style={{ width: 30, height: 30, borderRadius: 9, flexShrink: 0,
+              background: apiKey ? 'linear-gradient(145deg,#90C898,#6AAA78)' : 'linear-gradient(145deg,#E8C870,#D4A840)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              boxShadow: apiKey ? '3px 3px 8px rgba(100,160,110,0.35)' : '3px 3px 8px rgba(180,140,50,0.35)',
+            }}>
+              <span style={{ fontSize: '0.9rem' }}>{apiKey ? '✓' : '⚡'}</span>
+            </div>
+            <div style={{ flex: 1, minWidth: 200 }}>
+              <div style={{ fontSize: '0.72rem', fontWeight: 700, color: apiKey ? '#3A6A48' : '#8A6820', marginBottom: 5 }}>
+                {apiKey ? 'Groq API active — paste a new key below to replace' : 'Groq API Key Required — free at console.groq.com'}
               </div>
               <input
                 className="input-neu"
                 type="text"
                 value={apiKey}
                 onChange={e => saveKey(e.target.value.trim())}
+                onPaste={e => {
+                  const v = e.clipboardData.getData('text').trim();
+                  if (v) { saveKey(v); e.preventDefault(); }
+                }}
                 placeholder="Paste your gsk_... key here"
-                style={{ width: '100%', fontSize: '0.82rem', fontFamily: 'monospace', letterSpacing: '0.02em', color: 'var(--text-dark)' }}
+                style={{ width: '100%', fontSize: '0.78rem', fontFamily: 'monospace', color: 'var(--text-dark)' }}
                 autoComplete="off"
                 spellCheck={false}
               />
             </div>
-          ) : (
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 18px', background: 'rgba(122,170,136,0.09)', borderRadius: 'var(--r-md)', border: '1px solid rgba(122,170,136,0.25)' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#7AAA88', boxShadow: '0 0 6px #7AAA8866', flexShrink: 0 }} />
-                <span style={{ fontSize: '0.75rem', fontWeight: 600, color: '#4A7A58' }}>Groq API active</span>
-                <span style={{ fontSize: '0.68rem', color: 'var(--text-light)', fontFamily: 'monospace' }}>{apiKey.slice(0,14)}···{apiKey.slice(-4)}</span>
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                <input
-                  className="input-neu"
-                  type="text"
-                  placeholder="Paste new key to replace"
-                  style={{ fontSize: '0.70rem', fontFamily: 'monospace', width: 220, padding: '5px 10px', color: 'var(--text-mid)' }}
-                  autoComplete="off"
-                  spellCheck={false}
-                  onPaste={e => { const v = e.clipboardData.getData('text').trim(); if (v.startsWith('gsk_')) { saveKey(v); e.preventDefault(); }}}
-                  onChange={e => { const v = e.target.value.trim(); if (v.startsWith('gsk_') && v.length > 20) saveKey(v); }}
-                />
-                <button onClick={() => saveKey('')} style={{ background: 'rgba(200,128,128,0.10)', border: '1px solid rgba(200,128,128,0.22)', borderRadius: 8, cursor: 'pointer', fontSize: '0.68rem', color: '#C08080', padding: '5px 12px', fontWeight: 600, whiteSpace: 'nowrap' }}>Clear key</button>
-              </div>
-            </div>
-          )}
+            {apiKey && (
+              <button onClick={() => saveKey('')} style={{ background: 'rgba(200,128,128,0.10)', border: '1px solid rgba(200,128,128,0.22)', borderRadius: 8, cursor: 'pointer', fontSize: '0.68rem', color: '#C08080', padding: '6px 14px', fontWeight: 600, whiteSpace: 'nowrap', flexShrink: 0 }}>Clear</button>
+            )}
+          </div>
         </div>
 
         {/* Header */}
