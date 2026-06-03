@@ -484,20 +484,25 @@ const DiagnosisEngine: React.FC = () => {
   const selectListing = (l: RealListing) => {
     setSelectedListing(l); resetPipeline();
     if (marketData) {
-      setPropertyInput(buildPropertyString(l));
-      setBehavioralInput(buildBehavioralString(l));
-      setMarketInput(buildMarketString(l, marketData));
+      const pStr = buildPropertyString(l);
+      const bStr = buildBehavioralString(l);
+      const mStr = buildMarketString(l, marketData);
+      setPropertyInput(pStr);
+      setBehavioralInput(bStr);
+      setMarketInput(mStr);
+      // Auto-run diagnosis immediately
+      setTimeout(() => runAnalysisWithData(pStr, bStr, mStr), 80);
     }
   };
 
-  const runAnalysis = async () => {
-    if (!propertyInput.trim()) return;
+  const runAnalysisWithData = async (pInput: string, bInput: string, mInput: string) => {
+    if (!pInput.trim()) return;
     setRunning(true); setResult(null); setDiagError('');
     setNodeStatus({ ingest: 'running', behavioral: 'idle', diagnosis: 'idle' });
     setNodeContent({ ingest: '', behavioral: '', diagnosis: '' });
     try {
       const res = await runDiagnosis(
-        propertyInput, behavioralInput, marketInput,
+        pInput, bInput, mInput,
         (node) => {
           if (node === 'Behavioral') setNodeStatus(s => ({ ...s, ingest: 'done', behavioral: 'running' }));
           if (node === 'Diagnosis')  setNodeStatus(s => ({ ...s, behavioral: 'done', diagnosis: 'running' }));
@@ -505,8 +510,7 @@ const DiagnosisEngine: React.FC = () => {
         (token, node) => {
           const k = node === 'Ingest' ? 'ingest' : node === 'Behavioral' ? 'behavioral' : 'diagnosis';
           if (k === 'diagnosis') {
-            // Don't stream raw JSON — show progress indicator instead
-            setNodeContent(c => ({ ...c, diagnosis: 'Parsing behavioral signals and classifying root cause...' }));
+            setNodeContent(c => ({ ...c, diagnosis: 'Classifying root cause — parsing behavioral pattern matrix...' }));
           } else {
             setNodeContent(c => ({ ...c, [k]: c[k as keyof typeof c] + token }));
           }
@@ -519,6 +523,8 @@ const DiagnosisEngine: React.FC = () => {
       setDiagError(err?.message || String(err));
     } finally { setRunning(false); }
   };
+
+  const runAnalysis = () => runAnalysisWithData(propertyInput, behavioralInput, marketInput);
 
   return (
     <section id="engine" style={{ padding: '80px 24px', maxWidth: 1180, margin: '0 auto', position: 'relative' }}>
@@ -804,24 +810,34 @@ const DiagnosisEngine: React.FC = () => {
                       <div style={{ fontSize: '0.62rem', color: 'var(--text-light)', marginTop: 4, fontWeight: 600 }}>Inquiry Rate</div>
                     </div>
                   </div>
-                  {/* Market comp sparkline */}
+                  {/* Market comp sparkline — real prices from loaded listings */}
                   <div style={{ paddingTop: 12, borderTop: '1px solid var(--sand-dark)' }}>
                     <div style={{ fontSize: '0.61rem', color: 'var(--text-light)', marginBottom: 8, fontWeight: 600 }}>COMP PRICE POSITION</div>
-                    <div style={{ display: 'flex', alignItems: 'flex-end', gap: 3, height: 36 }}>
-                      {[0.78, 0.82, 0.91, 1.0, 1.04, 1.08, 1.15].map((v, i) => {
-                        const isThis = i === 3;
-                        const h = Math.round(v * 36);
-                        return (
-                          <div key={i} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
-                            <div style={{ width: '100%', height: h, borderRadius: '4px 4px 2px 2px', background: isThis ? 'linear-gradient(180deg,#7AAABE,#5A8AA0)' : 'var(--sand-dark)', transition: 'height 0.7s ease', boxShadow: isThis ? '0 2px 8px rgba(122,170,190,0.4)' : 'none' }} />
-                            {isThis && <div style={{ fontSize: '0.52rem', color: '#7AAABE', fontWeight: 700, whiteSpace: 'nowrap' }}>THIS</div>}
-                          </div>
-                        );
-                      })}
-                    </div>
+                    {(() => {
+                      const comps = marketData ? [...marketData.listings].sort((a, b) => a.listedPrice - b.listedPrice) : [];
+                      const allPrices = comps.map(c => c.listedPrice);
+                      const minP = Math.min(...allPrices, selectedListing.listedPrice);
+                      const maxP = Math.max(...allPrices, selectedListing.listedPrice);
+                      const range = maxP - minP || 1;
+                      const bars = comps.length > 0 ? comps : [{ listedPrice: selectedListing.listedPrice, id: selectedListing.id }];
+                      return (
+                        <div style={{ display: 'flex', alignItems: 'flex-end', gap: 3, height: 44 }}>
+                          {bars.map((c: any, i: number) => {
+                            const isThis = c.id === selectedListing.id || c.listedPrice === selectedListing.listedPrice;
+                            const h = Math.max(6, Math.round(((c.listedPrice - minP) / range) * 36) + 8);
+                            return (
+                              <div key={i} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
+                                <div style={{ width: '100%', height: h, borderRadius: '4px 4px 2px 2px', background: isThis ? 'linear-gradient(180deg,#7AAABE,#5A8AA0)' : 'var(--sand-dark)', transition: 'height 0.7s ease', boxShadow: isThis ? '0 2px 8px rgba(122,170,190,0.4)' : 'none', opacity: isThis ? 1 : 0.65 }} />
+                                {isThis && <div style={{ fontSize: '0.50rem', color: '#7AAABE', fontWeight: 700, whiteSpace: 'nowrap' }}>THIS</div>}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      );
+                    })()}
                     <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 4 }}>
-                      <span style={{ fontSize: '0.56rem', color: 'var(--text-light)' }}>Cheapest</span>
-                      <span style={{ fontSize: '0.56rem', color: 'var(--text-light)' }}>Priciest</span>
+                      <span style={{ fontSize: '0.56rem', color: 'var(--text-light)' }}>Lowest rent</span>
+                      <span style={{ fontSize: '0.56rem', color: 'var(--text-light)' }}>Highest rent</span>
                     </div>
                   </div>
                 </div>
@@ -846,7 +862,7 @@ const DiagnosisEngine: React.FC = () => {
                 {!result && !running && (
                   <div style={{ padding: '32px 24px', borderRadius: 'var(--r-lg)', border: '1.5px dashed var(--sand-dark)', textAlign: 'center', opacity: 0.55 }}>
                     <div style={{ fontSize: '1.8rem', marginBottom: 10 }}>🧠</div>
-                    <div style={{ fontSize: '0.78rem', color: 'var(--text-light)', lineHeight: 1.6 }}>Hit Run Diagnosis to stream all 3 nodes live<br/>and receive a full root-cause verdict</div>
+                    <div style={{ fontSize: '0.78rem', color: 'var(--text-light)', lineHeight: 1.6 }}>Diagnosis runs automatically on selection<br/>or hit Run Diagnosis to re-run</div>
                   </div>
                 )}
               </div>
