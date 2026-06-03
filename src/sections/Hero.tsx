@@ -2,24 +2,23 @@ import React from 'react';
 
 const Hero: React.FC = () => {
   return (
-    <section style={{
+    <section className="hero-section" style={{
       position: 'relative', minHeight: '100vh', display: 'flex',
       alignItems: 'center', justifyContent: 'center', overflow: 'hidden',
       padding: '80px 24px 60px',
     }}>
       {/* Background blobs */}
-      <div className="blob blob-blue fa" style={{ width: 420, height: 360, top: '-80px', right: '-60px', opacity: 0.75 }} />
-      <div className="blob blob-blush fb" style={{ width: 280, height: 240, bottom: '80px', left: '-40px', opacity: 0.65 }} />
+      <div className="blob blob-blue fa" style={{ width: 'clamp(200px, 42vw, 420px)', height: 'clamp(160px, 36vw, 360px)', top: '-80px', right: '-60px', opacity: 0.75 }} />
+      <div className="blob blob-blush fb" style={{ width: 'clamp(140px, 28vw, 280px)', height: 'clamp(110px, 24vw, 240px)', bottom: '80px', left: '-40px', opacity: 0.65 }} />
       <div className="blob blob-sage fc" style={{ width: 200, height: 180, top: '40%', left: '8%', opacity: 0.5 }} />
       <div className="blob blob-lav fd" style={{ width: 160, height: 140, bottom: '15%', right: '12%', opacity: 0.55 }} />
-      <div className="blob blob-cream" style={{ width: 120, height: 100, top: '25%', right: '25%', opacity: 0.6, animation: 'floatY 10s ease-in-out infinite 4s' }} />
 
-      <div style={{ position: 'relative', zIndex: 1, maxWidth: 760, textAlign: 'center' }}>
+      <div style={{ position: 'relative', zIndex: 1, maxWidth: 760, textAlign: 'center', width: '100%' }}>
         {/* Eyebrow tag */}
         <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 28 }}>
-          <div className="neu-pill-raised" style={{ padding: '8px 22px', display: 'inline-flex', alignItems: 'center', gap: 10 }}>
+          <div className="neu-pill-raised" style={{ padding: '8px 18px', display: 'inline-flex', alignItems: 'center', gap: 8 }}>
             <div className="dot d-sage" />
-            <span style={{ fontSize: '0.75rem', fontWeight: 500, letterSpacing: '0.08em', color: 'var(--text-mid)' }}>
+            <span style={{ fontSize: 'clamp(0.62rem, 2vw, 0.75rem)', fontWeight: 500, letterSpacing: '0.08em', color: 'var(--text-mid)' }}>
               REVENUE DIAGNOSIS ENGINE
             </span>
             <div className="dot d-blue" />
@@ -34,39 +33,39 @@ const Hero: React.FC = () => {
         </h1>
 
         {/* Subheadline */}
-        <p style={{ fontSize: '1.05rem', color: 'var(--text-mid)', marginBottom: 40, maxWidth: 540, margin: '0 auto 40px', lineHeight: 1.7 }}>
+        <p style={{ fontSize: 'clamp(0.88rem, 2.5vw, 1.05rem)', color: 'var(--text-mid)', marginBottom: 40, maxWidth: 540, margin: '0 auto 40px', lineHeight: 1.7 }}>
           Across 2,700+ properties, your current pricing agent outputs a number. PERCEPT tells you whether that number is even the right variable to optimize — and which lever actually moves revenue.
         </p>
 
         {/* CTA buttons */}
-        <div style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap', marginBottom: 64 }}>
-          <button className="btn btn-blue" style={{ padding: '13px 32px', fontSize: '0.9rem' }}
+        <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap', marginBottom: 56 }}>
+          <button className="btn btn-blue" style={{ padding: 'clamp(11px,2vw,13px) clamp(22px,4vw,32px)', fontSize: 'clamp(0.82rem,2vw,0.9rem)' }}
             onClick={() => document.getElementById('engine')?.scrollIntoView({ behavior: 'smooth' })}>
             Run a Diagnosis
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
           </button>
-          <button className="btn" style={{ padding: '13px 32px', fontSize: '0.9rem' }}
+          <button className="btn" style={{ padding: 'clamp(11px,2vw,13px) clamp(22px,4vw,32px)', fontSize: 'clamp(0.82rem,2vw,0.9rem)' }}
             onClick={() => document.getElementById('portfolio')?.scrollIntoView({ behavior: 'smooth' })}>
             View Portfolio
           </button>
         </div>
 
         {/* Stats row */}
-        <div style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap' }}>
+        <div className="hero-stats" style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
           {[
             { value: '2,714', label: 'Properties Analyzed', color: 'var(--blue-dark)' },
             { value: '$4.28M', label: 'Annual Leakage Found', color: 'var(--blush-dark)' },
             { value: '91%', label: 'Diagnosis Accuracy', color: 'var(--sage-dark)' },
           ].map((s, i) => (
-            <div key={i} className="neu-raised-sm" style={{ padding: '18px 28px', textAlign: 'center', minWidth: 140 }}>
-              <div style={{ fontFamily: 'var(--f-display)', fontSize: '1.8rem', color: s.color, lineHeight: 1 }}>{s.value}</div>
-              <div style={{ fontSize: '0.7rem', fontWeight: 500, letterSpacing: '0.07em', color: 'var(--text-light)', marginTop: 6, textTransform: 'uppercase' }}>{s.label}</div>
+            <div key={i} className="hero-stat neu-raised-sm" style={{ padding: '16px 22px', textAlign: 'center', minWidth: 120, flex: '1 1 120px', maxWidth: 200 }}>
+              <div className="hero-stat-val" style={{ fontFamily: 'var(--f-display)', fontSize: '1.8rem', color: s.color, lineHeight: 1 }}>{s.value}</div>
+              <div style={{ fontSize: '0.68rem', fontWeight: 500, letterSpacing: '0.07em', color: 'var(--text-light)', marginTop: 6, textTransform: 'uppercase' }}>{s.label}</div>
             </div>
           ))}
         </div>
       </div>
 
-      {/* Floating mini cards */}
+      {/* Floating mini cards — desktop only */}
       <div className="neu-float r-hide" style={{ position: 'absolute', left: '3%', top: '30%', padding: '14px 18px', width: 200, zIndex: 2 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
           <div className="dot d-blush" />

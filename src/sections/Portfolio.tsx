@@ -193,7 +193,7 @@ const Portfolio: React.FC = () => {
   };
 
   return (
-    <section id="portfolio" style={{ padding: '80px 24px', maxWidth: 1100, margin: '0 auto', position: 'relative' }}>
+    <section id="portfolio" style={{ padding: 'clamp(56px, 8vw, 80px) clamp(16px, 4vw, 24px)', maxWidth: 1100, margin: '0 auto', position: 'relative' }}>
       {/* Background blobs */}
       <div className="blob blob-sage fa" style={{ width: 300, height: 260, top: 40, right: -60, opacity: 0.4, zIndex: 0 }} />
 

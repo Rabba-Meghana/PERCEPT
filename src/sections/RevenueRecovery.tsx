@@ -17,7 +17,7 @@ const RevenueRecovery: React.FC = () => {
   const priceLeakage = PORTFOLIO.filter(p => p.diagnosis === 'PRICE').reduce((s, p) => s + p.annualLeakage, 0);
 
   return (
-    <section style={{ padding: '80px 24px', maxWidth: 1100, margin: '0 auto', position: 'relative' }}>
+    <section style={{ padding: 'clamp(56px, 8vw, 80px) clamp(16px, 4vw, 24px)', maxWidth: 1100, margin: '0 auto', position: 'relative' }}>
       <div className="blob blob-blush fa" style={{ width: 280, height: 240, top: 20, left: -60, opacity: 0.4, zIndex: 0 }} />
       <div className="blob blob-lav fd" style={{ width: 220, height: 190, bottom: 40, right: -40, opacity: 0.35, zIndex: 0 }} />
 
@@ -33,7 +33,7 @@ const RevenueRecovery: React.FC = () => {
           </p>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.6fr', gap: 24, alignItems: 'start' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))', gap: 24, alignItems: 'start' }}>
           {/* Left: breakdown */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
             {[

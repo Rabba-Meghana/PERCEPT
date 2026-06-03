@@ -275,7 +275,7 @@ const DiagnosisResultCard: React.FC<{ result: DiagnosisResult; listing: RealList
       {listing && (
         <div style={{ padding: '18px 22px', background: 'var(--neu-bg)', borderRadius: 'var(--r-lg)', boxShadow: '5px 5px 14px var(--neu-sd), -4px -4px 10px var(--neu-sl)' }}>
           <div style={{ fontSize: '0.65rem', fontWeight: 700, letterSpacing: '0.08em', color: 'var(--text-light)', textTransform: 'uppercase', marginBottom: 14 }}>Signal Breakdown</div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 20px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: '0 20px' }}>
             <SignalMeter label="Click-Through Rate" value={listing.ctr} benchmark={0.45} color={cfg.color} />
             <SignalMeter label="Inquiry Rate" value={listing.inquiryRate} benchmark={0.28} color={cfg.color} />
             <SignalMeter label="Save Rate" value={listing.saveRate} benchmark={0.18} color={cfg.color} />
@@ -534,7 +534,7 @@ const DiagnosisEngine: React.FC = () => {
   const runAnalysis = () => runAnalysisWithData(propertyInput, behavioralInput, marketInput);
 
   return (
-    <section id="engine" style={{ padding: '80px 24px', maxWidth: 1180, margin: '0 auto', position: 'relative' }}>
+    <section id="engine" style={{ padding: 'clamp(56px, 8vw, 80px) clamp(16px, 4vw, 24px)', maxWidth: 1180, margin: '0 auto', position: 'relative' }}>
       <div className="blob blob-blue fb"   style={{ width: 340, height: 280, bottom: 80,  left: -70,  opacity: 0.35, zIndex: 0 }} />
       <div className="blob blob-blush fc"  style={{ width: 200, height: 170, top: 120,   right: -20, opacity: 0.33, zIndex: 0 }} />
 
@@ -543,7 +543,7 @@ const DiagnosisEngine: React.FC = () => {
         {/* ── Key Banner ── */}
         <div style={{ marginBottom: 28 }}>
           <div style={{
-            display: 'flex', alignItems: 'center', gap: 10, padding: '12px 18px',
+            display: 'flex', alignItems: 'center', gap: 10, padding: '12px 16px',
             background: apiKey ? 'rgba(122,170,136,0.09)' : 'rgba(212,168,112,0.13)',
             borderRadius: 'var(--r-lg)',
             border: `1.5px solid ${apiKey ? 'rgba(122,170,136,0.28)' : 'rgba(212,168,112,0.38)'}`,
@@ -662,7 +662,7 @@ const DiagnosisEngine: React.FC = () => {
                 <span style={{ fontSize: '0.75rem', color: 'var(--text-light)', marginLeft: 8 }}>{marketData.listings.length} listings in {marketData.zipCode}</span>
               </div>
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(256px, 1fr))', gap: 12 }}>
+            <div className="listing-grid-inner" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 240px), 1fr))', gap: 12 }}>
               {marketData.listings.map(l => (
                 <ListingCard key={l.id} l={l} isSelected={selectedListing?.id === l.id} onClick={() => selectListing(l)} />
               ))}
@@ -673,7 +673,7 @@ const DiagnosisEngine: React.FC = () => {
         {/* ══ STEP 3 ══ */}
         {selectedListing && (
           <div className="neu-raised-sm" style={{ padding: '22px 24px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 26 }}>
+            <div className="step3-header" style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 26, flexWrap: 'wrap' }}>
               <div style={{ width: 28, height: 28, borderRadius: '50%', background: 'linear-gradient(145deg,#D8D0E8,#9888B8)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '3px 3px 8px rgba(152,136,184,0.4)', flexShrink: 0 }}>
                 <span style={{ fontSize: '0.73rem', fontWeight: 800, color: 'white' }}>3</span>
               </div>
@@ -698,7 +698,7 @@ const DiagnosisEngine: React.FC = () => {
             )}
 
             {/* ── TWO COLUMN LAYOUT ── */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.15fr', gap: 22, alignItems: 'start' }}>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: 18, alignItems: "start" }}>
 
               {/* ══ LEFT: VISUAL SIGNAL PANEL ══ */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
@@ -936,7 +936,7 @@ const DiagnosisEngine: React.FC = () => {
               </div>
 
               {/* ══ RIGHT: PIPELINE + VERDICT ══ */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 16, minWidth: 0 }}>
+              <div className="diag-right-first" style={{ display: 'flex', flexDirection: 'column', gap: 16, minWidth: 0 }}>
 
                 {/* Pipeline */}
                 <div style={{ padding: '18px 20px', background: 'var(--neu-bg)', borderRadius: 'var(--r-lg)', boxShadow: '5px 5px 14px var(--neu-sd), -4px -4px 10px var(--neu-sl)' }}>

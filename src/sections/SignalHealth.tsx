@@ -33,7 +33,7 @@ const SignalHealth: React.FC = () => {
   const avgFreshness = Math.round(SIGNALS.filter(s => s.status !== 'stale').reduce((a, s) => a + s.freshness, 0) / SIGNALS.filter(s => s.status !== 'stale').length);
 
   return (
-    <section style={{ padding: '80px 24px', maxWidth: 1100, margin: '0 auto', position: 'relative' }}>
+    <section style={{ padding: 'clamp(56px, 8vw, 80px) clamp(16px, 4vw, 24px)', maxWidth: 1100, margin: '0 auto', position: 'relative' }}>
       <div className="blob blob-cream fa" style={{ width: 300, height: 260, top: -40, right: -50, opacity: 0.6, zIndex: 0 }} />
 
       <div style={{ position: 'relative', zIndex: 1 }}>

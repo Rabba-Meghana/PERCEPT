@@ -85,3 +85,111 @@ textarea.input-neu{border-radius:var(--r-md);resize:vertical;min-height:90px;lin
 
 @keyframes spin-slow{to{transform:rotate(360deg)}}
 .spin-slow{animation:spin-slow 0.8s linear infinite}
+
+/* ─── MOBILE RESPONSIVE ─────────────────────────────────────────── */
+@media (max-width: 768px) {
+  /* Nav */
+  .percept-nav-links { display: none !important; }
+  .percept-nav-mobile-btn { display: flex !important; }
+
+  /* Hero */
+  .hero-section { padding: 72px 18px 48px !important; }
+  .hero-stats { gap: 10px !important; }
+  .hero-stat { min-width: 100px !important; padding: 14px 16px !important; }
+  .hero-stat-val { font-size: 1.4rem !important; }
+
+  /* Sections */
+  .section-pad { padding: 56px 18px !important; }
+
+  /* Diagnosis Engine two-col → one-col */
+  .diag-two-col { grid-template-columns: 1fr !important; }
+
+  /* Listing grid → 1 col on small, 2 col on medium */
+  .listing-grid { grid-template-columns: 1fr !important; }
+
+  /* Step 3 header — stack button below title */
+  .step3-header { flex-wrap: wrap !important; }
+  .step3-btn { width: 100% !important; margin-top: 12px; }
+
+  /* Key banner input */
+  .key-banner { flex-direction: column !important; align-items: stretch !important; }
+
+  /* Revenue recovery grid */
+  .rev-grid { grid-template-columns: 1fr !important; }
+
+  /* Portfolio grid */
+  .portfolio-grid { grid-template-columns: 1fr !important; }
+
+  /* Signal health grid */
+  .signal-grid { grid-template-columns: 1fr !important; }
+
+  /* Gauge circles — smaller */
+  .perc-gap-circles { gap: 6px !important; }
+
+  /* Section headers */
+  h2 { font-size: clamp(1.4rem, 5vw, 2rem) !important; }
+  h1 { font-size: clamp(1.9rem, 7vw, 3.2rem) !important; }
+}
+
+@media (min-width: 480px) and (max-width: 768px) {
+  .listing-grid { grid-template-columns: 1fr 1fr !important; }
+}
+
+@media (max-width: 480px) {
+  /* Zip button row wraps nicely */
+  .zip-btns { gap: 4px !important; }
+  .zip-btn { font-size: 0.62rem !important; padding: 4px 9px !important; }
+
+  /* Market stats pills wrap */
+  .market-stats { gap: 5px !important; }
+
+  /* Node step boxes — limit height more aggressively */
+  .node-box { max-height: 90px !important; }
+
+  /* Diagnosis result card header */
+  .diag-header { flex-direction: column !important; align-items: flex-start !important; }
+
+  /* Signal breakdown 2×2 → single col */
+  .signal-breakdown { grid-template-columns: 1fr !important; }
+
+  /* Comp circles smaller */
+  .comp-circle { width: 60px !important; height: 60px !important; }
+}
+
+/* ─── Diagnosis two-col layout ─────────────────────────────────── */
+.diag-two-col {
+  grid-template-columns: 1fr 1.15fr;
+}
+@media (max-width: 860px) {
+  .diag-two-col {
+    grid-template-columns: 1fr !important;
+  }
+  /* Right panel comes first on mobile so user sees pipeline immediately */
+  .diag-right-first {
+    order: -1;
+  }
+}
+
+/* Step 3 run button full-width on mobile */
+@media (max-width: 600px) {
+  .step3-header {
+    row-gap: 12px;
+  }
+  .step3-header > button {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+  .percept-nav-links {
+    display: none !important;
+  }
+  .percept-nav-mobile-btn {
+    display: flex !important;
+  }
+}
+
+/* Make listing grid min 2 col on tablets */
+@media (min-width: 540px) and (max-width: 860px) {
+  .listing-grid-inner {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
