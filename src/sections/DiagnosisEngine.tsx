@@ -439,7 +439,12 @@ const ListingCard: React.FC<{ l: RealListing; isSelected: boolean; onClick: () =
 // ─── MAIN COMPONENT ──────────────────────────────────────────────
 const DiagnosisEngine: React.FC = () => {
   // API key — persisted in localStorage so it survives page refresh
-  const [apiKey, setApiKey] = useState<string>(() => localStorage.getItem('percept_groq_key') || '');
+  const [apiKey, setApiKey] = useState<string>(() => {
+    // Always use injected key if available (overrides stale localStorage)
+    const injected = (window as any).__PK__ || '';
+    if (injected) { localStorage.setItem('percept_groq_key', injected); return injected; }
+    return localStorage.getItem('percept_groq_key') || '';
+  });
   const saveKey = (k: string) => { setApiKey(k); localStorage.setItem('percept_groq_key', k); (window as any).__PERCEPT_KEY__ = k; };
 
   const [zipCode, setZipCode]       = useState('80205');
@@ -518,23 +523,43 @@ const DiagnosisEngine: React.FC = () => {
       <div style={{ position: 'relative', zIndex: 1 }}>
 
         {/* ── Key Banner ── */}
-        {!apiKey && (
-          <div style={{ marginBottom: 28, padding: '14px 20px', background: 'rgba(212,168,112,0.10)', borderRadius: 'var(--r-md)', border: '1px solid rgba(212,168,112,0.25)', display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap' }}>
-            <span style={{ fontSize: '0.75rem', color: '#B88A50', fontWeight: 600 }}>⚡ Groq API Key</span>
-            <span style={{ fontSize: '0.73rem', color: 'var(--text-mid)' }}>Paste your key to activate the diagnosis engine. Free at <a href="https://console.groq.com" target="_blank" rel="noopener noreferrer" style={{ color: '#7AAABE' }}>console.groq.com</a></span>
-            <input className="input-neu" type="password" value={apiKey} onChange={e => saveKey(e.target.value)}
-              placeholder="Paste API key" style={{ width: 260, fontSize: '0.76rem', marginLeft: 'auto' }} />
-          </div>
-        )}
-        {apiKey && (
-          <div style={{ marginBottom: 24, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 8 }}>
-            <div style={{ padding: '4px 14px', background: 'rgba(122,170,136,0.10)', borderRadius: 100, border: '1px solid rgba(122,170,136,0.22)', display: 'flex', alignItems: 'center', gap: 6 }}>
-              <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#7AAA88' }} />
-              <span style={{ fontSize: '0.67rem', fontWeight: 600, color: '#5A8A68' }}>Groq API key active</span>
-              <button onClick={() => saveKey('')} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '0.65rem', color: 'var(--text-light)', marginLeft: 4, padding: 0 }}>×</button>
+        <div style={{ marginBottom: 28 }}>
+          {!apiKey ? (
+            <div style={{ padding: '20px 24px', background: 'rgba(212,168,112,0.13)', borderRadius: 'var(--r-lg)', border: '1.5px solid rgba(212,168,112,0.35)', boxShadow: '4px 4px 12px var(--neu-sd), -3px -3px 9px var(--neu-sl)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
+                <div style={{ width: 32, height: 32, borderRadius: 10, background: 'linear-gradient(145deg,#E8C870,#D4A840)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '3px 3px 8px rgba(180,140,50,0.35)', flexShrink: 0 }}>
+                  <span style={{ fontSize: '1rem' }}>⚡</span>
+                </div>
+                <div>
+                  <div style={{ fontSize: '0.82rem', fontWeight: 700, color: '#8A6820' }}>Groq API Key Required</div>
+                  <div style={{ fontSize: '0.70rem', color: 'var(--text-mid)' }}>Free at <a href="https://console.groq.com" target="_blank" rel="noopener noreferrer" style={{ color: '#7AAABE', fontWeight: 600 }}>console.groq.com</a> · Powers all 3 diagnosis nodes</div>
+                </div>
+              </div>
+              <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+                <input
+                  className="input-neu"
+                  type="text"
+                  value={apiKey}
+                  onChange={e => saveKey(e.target.value.trim())}
+                  placeholder="Paste your gsk_... key here"
+                  style={{ flex: 1, fontSize: '0.82rem', fontFamily: 'monospace', letterSpacing: '0.02em', color: 'var(--text-dark)' }}
+                  autoComplete="off"
+                  spellCheck={false}
+                />
+                <div style={{ fontSize: '0.68rem', color: 'var(--text-light)', flexShrink: 0, whiteSpace: 'nowrap' }}>Press Enter or start typing</div>
+              </div>
             </div>
-          </div>
-        )}
+          ) : (
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 18px', background: 'rgba(122,170,136,0.09)', borderRadius: 'var(--r-md)', border: '1px solid rgba(122,170,136,0.25)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#7AAA88', boxShadow: '0 0 6px #7AAA8866' }} />
+                <span style={{ fontSize: '0.75rem', fontWeight: 600, color: '#4A7A58' }}>Groq API active</span>
+                <span style={{ fontSize: '0.68rem', color: 'var(--text-light)', fontFamily: 'monospace' }}>{apiKey.slice(0,12)}···{apiKey.slice(-4)}</span>
+              </div>
+              <button onClick={() => saveKey('')} style={{ background: 'rgba(200,128,128,0.10)', border: '1px solid rgba(200,128,128,0.22)', borderRadius: 8, cursor: 'pointer', fontSize: '0.68rem', color: '#C08080', padding: '3px 10px', fontWeight: 600 }}>Change key</button>
+            </div>
+          )}
+        </div>
 
         {/* Header */}
         <div style={{ marginBottom: 44 }}>
