@@ -563,7 +563,7 @@ const DiagnosisEngine: React.FC = () => {
               </div>
               <input
                 className="input-neu"
-                type="text"
+                type="password"
                 value={apiKey}
                 onChange={e => saveKey(e.target.value.trim())}
                 onPaste={e => {
