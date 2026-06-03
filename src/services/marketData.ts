@@ -17,6 +17,7 @@ function getGroqKey(): string {
 }
 
 // Real property photos from Unsplash (free, no key, reliable CDN)
+// Large pools — each category has enough variety that listings look distinct
 const PHOTO_POOLS = {
   living_room: [
     'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=600&q=80',
@@ -25,6 +26,12 @@ const PHOTO_POOLS = {
     'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=600&q=80',
     'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=600&q=80',
     'https://images.unsplash.com/photo-1567016432779-094069958ea5?w=600&q=80',
+    'https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=600&q=80',
+    'https://images.unsplash.com/photo-1502005229762-cf1b2da7c5d6?w=600&q=80',
+    'https://images.unsplash.com/photo-1524758631624-e2822e304c36?w=600&q=80',
+    'https://images.unsplash.com/photo-1416331108676-a22ccbe87a88?w=600&q=80',
+    'https://images.unsplash.com/photo-1571731956672-f2b94d7dd0cb?w=600&q=80',
+    'https://images.unsplash.com/photo-1600210491369-e753d80a41f3?w=600&q=80',
   ],
   kitchen: [
     'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=600&q=80',
@@ -32,6 +39,13 @@ const PHOTO_POOLS = {
     'https://images.unsplash.com/photo-1484154218962-a197022b5858?w=600&q=80',
     'https://images.unsplash.com/photo-1604709177225-055f99402ea3?w=600&q=80',
     'https://images.unsplash.com/photo-1588854337115-1c67d9247e4d?w=600&q=80',
+    'https://images.unsplash.com/photo-1556909172-54557c7e4fb7?w=600&q=80',
+    'https://images.unsplash.com/photo-1600585154526-990dced4db0d?w=600&q=80',
+    'https://images.unsplash.com/photo-1556909048-f3d4bcfe7d09?w=600&q=80',
+    'https://images.unsplash.com/photo-1507089947368-19c1da9775ae?w=600&q=80',
+    'https://images.unsplash.com/photo-1575315462-33d5a19e0b3e?w=600&q=80',
+    'https://images.unsplash.com/photo-1615874959474-d609969a20ed?w=600&q=80',
+    'https://images.unsplash.com/photo-1556909190-59b19d0f9b46?w=600&q=80',
   ],
   bedroom: [
     'https://images.unsplash.com/photo-1505693314120-0d443867891c?w=600&q=80',
@@ -39,21 +53,43 @@ const PHOTO_POOLS = {
     'https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=600&q=80',
     'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=600&q=80',
     'https://images.unsplash.com/photo-1616594039964-ae9021a400a0?w=600&q=80',
+    'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=600&q=80',
+    'https://images.unsplash.com/photo-1578683010236-d716f9a3f461?w=600&q=80',
+    'https://images.unsplash.com/photo-1600210491892-03d54078c945?w=600&q=80',
+    'https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=600&q=80',
+    'https://images.unsplash.com/photo-1588046130717-0eb0c9a3ba15?w=600&q=80',
+    'https://images.unsplash.com/photo-1564078516393-cf04bd966897?w=600&q=80',
+    'https://images.unsplash.com/photo-1497366811353-6870744d04b2?w=600&q=80',
   ],
   bathroom: [
     'https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?w=600&q=80',
     'https://images.unsplash.com/photo-1620626011761-996317702519?w=600&q=80',
     'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=600&q=80',
+    'https://images.unsplash.com/photo-1600566752355-35792bedcfea?w=600&q=80',
+    'https://images.unsplash.com/photo-1556020685-ae41abfc9365?w=600&q=80',
+    'https://images.unsplash.com/photo-1507652313519-d4e9174996dd?w=600&q=80',
+    'https://images.unsplash.com/photo-1599619351208-3e6c839d6828?w=600&q=80',
+    'https://images.unsplash.com/photo-1603825491103-bd638b1873b4?w=600&q=80',
   ],
   exterior: [
     'https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=600&q=80',
     'https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=600&q=80',
     'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80',
     'https://images.unsplash.com/photo-1582407947304-fd86f28f3f4c?w=600&q=80',
+    'https://images.unsplash.com/photo-1523217582562-09d0def993a6?w=600&q=80',
+    'https://images.unsplash.com/photo-1592595896551-12b371d546d5?w=600&q=80',
+    'https://images.unsplash.com/photo-1600047509807-ba8f99d2cdde?w=600&q=80',
+    'https://images.unsplash.com/photo-1605276374104-dee2a0ed3cd6?w=600&q=80',
+    'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=600&q=80',
+    'https://images.unsplash.com/photo-1575517111839-3a3843ee7f5d?w=600&q=80',
   ],
   other: [
     'https://images.unsplash.com/photo-1527359443443-84a48aec73d2?w=600&q=80',
     'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=600&q=80',
+    'https://images.unsplash.com/photo-1600121848594-d8644e57abab?w=600&q=80',
+    'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=600&q=80',
+    'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=600&q=80',
+    'https://images.unsplash.com/photo-1574362848149-11496d93a7c7?w=600&q=80',
   ],
 };
 
@@ -120,14 +156,28 @@ function rndF(min: number, max: number, decimals = 2): number {
   return parseFloat((min + Math.random() * (max - min)).toFixed(decimals));
 }
 
-function assignPhotos(leadType: RealListing['leadPhotoType'], photoCount: number): string[] {
-  const pool = [...(PHOTO_POOLS[leadType] || PHOTO_POOLS.other)];
-  const others = Object.entries(PHOTO_POOLS)
-    .filter(([k]) => k !== leadType)
-    .flatMap(([, v]) => v);
-  const shuffled = others.sort(() => Math.random() - 0.5);
-  const all = [...pool, ...shuffled];
-  return all.slice(0, Math.min(photoCount, all.length, 6));
+function assignPhotos(leadType: RealListing['leadPhotoType'], photoCount: number, listingIndex: number): string[] {
+  const leadPool = [...(PHOTO_POOLS[leadType] || PHOTO_POOLS.other)];
+  // Rotate lead pool by listing index so each listing gets a different lead photo
+  const offset = listingIndex % leadPool.length;
+  const rotatedLead = [...leadPool.slice(offset), ...leadPool.slice(0, offset)];
+
+  // Pick supporting photos from OTHER room types, also offset by listing index
+  const supportTypes: (keyof typeof PHOTO_POOLS)[] = ['living_room', 'kitchen', 'bedroom', 'exterior', 'bathroom', 'other'];
+  const supportPhotos: string[] = [];
+  supportTypes
+    .filter(k => k !== leadType)
+    .forEach((k, ti) => {
+      const pool = PHOTO_POOLS[k];
+      const idx = (listingIndex + ti * 3) % pool.length;
+      supportPhotos.push(pool[idx]);
+    });
+
+  const all = [rotatedLead[0], ...supportPhotos, ...rotatedLead.slice(1)];
+  // Deduplicate
+  const seen = new Set<string>();
+  const unique = all.filter(u => { if (seen.has(u)) return false; seen.add(u); return true; });
+  return unique.slice(0, Math.min(photoCount, 6));
 }
 
 // ─── GROQ-POWERED LISTING GENERATION ─────────────────────────────
@@ -233,7 +283,7 @@ function buildFallbackListings(zip: string): RealListing[] {
       priceDropTotal: rnd(0, 150),
       photoCount: rnd(7, 18),
       leadPhotoType: leadType,
-      photos: assignPhotos(leadType, rnd(3, 6)),
+      photos: assignPhotos(leadType, rnd(3, 6), i),
       description: `${beds}BR/${baths}BA in ${pick(neighborhoods)}. ${pick(['Newly renovated kitchen.', 'Original hardwood floors.', 'City views from private balcony.', 'Updated appliances throughout.'])} ${pick(['Walking distance to light rail.', 'Steps from restaurants and bars.', 'Quiet residential street.', 'Near Cheesman Park.'])}`,
       amenities: amenityPool.sort(() => Math.random() - 0.5).slice(0, rnd(2, 5)),
       ctr: isBathLead ? rndF(0.60, 0.78) : rndF(0.32, 0.68),
@@ -274,7 +324,7 @@ export async function fetchMarketData(zipCode: string): Promise<MarketSummary> {
         priceDropTotal: l.priceDropTotal || 0,
         photoCount: l.photoCount || 10,
         leadPhotoType: leadType,
-        photos: assignPhotos(leadType, Math.min(l.photoCount || 6, 6)),
+        photos: assignPhotos(leadType, Math.min(l.photoCount || 6, 6), i),
         description: l.description || '',
         amenities: l.amenities || [],
         ctr: l.ctr || 0.45,
