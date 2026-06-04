@@ -440,12 +440,9 @@ const ListingCard: React.FC<{ l: RealListing; isSelected: boolean; onClick: () =
 const DiagnosisEngine: React.FC = () => {
   // API key — persisted in localStorage so it survives page refresh
   const [apiKey, setApiKey] = useState<string>(() => {
-    // Always use injected key if available (overrides stale localStorage)
-    const injected = (window as any).__PK__ || '';
-    if (injected) { localStorage.setItem('percept_groq_key', injected); return injected; }
     return localStorage.getItem('percept_groq_key') || '';
   });
-  const saveKey = (k: string) => { setApiKey(k); localStorage.setItem('percept_groq_key', k); (window as any).__PERCEPT_KEY__ = k; };
+  const saveKey = (k: string) => { setApiKey(k); localStorage.setItem('percept_groq_key', k); };
 
   const [zipCode, setZipCode]       = useState('80205');
   const [marketData, setMarketData] = useState<MarketSummary | null>(null);

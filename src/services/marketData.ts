@@ -7,11 +7,6 @@ const GROQ_API   = 'https://api.groq.com/openai/v1/chat/completions';
 const GROQ_MODEL = 'llama-3.3-70b-versatile';
 
 function getGroqKey(): string {
-  const injected = (window as any).__PK__ || '';
-  if (injected) {
-    if (typeof localStorage !== 'undefined') localStorage.setItem('percept_groq_key', injected);
-    return injected;
-  }
   if (typeof localStorage !== 'undefined') return localStorage.getItem('percept_groq_key') || '';
   return '';
 }
