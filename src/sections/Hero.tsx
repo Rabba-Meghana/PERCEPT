@@ -53,9 +53,9 @@ const Hero: React.FC = () => {
         {/* Stats row */}
         <div className="hero-stats" style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
           {[
-            { value: '2,714', label: 'Properties Analyzed', color: 'var(--blue-dark)' },
-            { value: '$4.28M', label: 'Annual Leakage Found', color: 'var(--blush-dark)' },
-            { value: '91%', label: 'Diagnosis Accuracy', color: 'var(--sage-dark)' },
+            { value: '4', label: 'Diagnosis Types', color: 'var(--blue-dark)' },
+            { value: '3-Node', label: 'LLM Pipeline', color: 'var(--blush-dark)' },
+            { value: 'Synthetic', label: 'Market Data · Denver', color: 'var(--sage-dark)' },
           ].map((s, i) => (
             <div key={i} className="hero-stat neu-raised-sm" style={{ padding: '16px 22px', textAlign: 'center', minWidth: 120, flex: '1 1 120px', maxWidth: 200 }}>
               <div className="hero-stat-val" style={{ fontFamily: 'var(--f-display)', fontSize: '1.8rem', color: s.color, lineHeight: 1 }}>{s.value}</div>

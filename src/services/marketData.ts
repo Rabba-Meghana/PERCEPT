@@ -1,6 +1,7 @@
 // ─────────────────────────────────────────────────────────────────
-// PERCEPT Market Data Service — Groq-powered real-feeling listings
-// Each pull generates fresh, varied, realistic data via LLM
+// PERCEPT Market Data Service — synthetic listings via Groq
+// Listings are LLM-generated against real Denver market profiles.
+// Behavioral signals (CTR, inquiry, save rate) are simulated.
 // ─────────────────────────────────────────────────────────────────
 
 const GROQ_API   = 'https://api.groq.com/openai/v1/chat/completions';

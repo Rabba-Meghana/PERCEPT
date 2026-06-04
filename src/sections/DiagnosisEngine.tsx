@@ -587,7 +587,7 @@ const DiagnosisEngine: React.FC = () => {
           </div>
           <h2 style={{ marginBottom: 12 }}>Real market data. Live reasoning.</h2>
           <p style={{ color: 'var(--text-mid)', maxWidth: 580, fontSize: '0.90rem', lineHeight: 1.65 }}>
-            Three steps: load a market → pick a property → watch all 3 LangGraph nodes stream token-by-token. The system diagnoses whether you have a price problem, a perception problem, an audience problem, or latent demand — and tells you exactly what to do.
+            Three steps: load a market → pick a property → watch all 3 pipeline nodes stream token-by-token. Listings are LLM-generated against real Denver market profiles. The diagnosis pipeline is real — three separate calls, each reasoning over the previous node's output.
           </p>
         </div>
 
@@ -599,7 +599,7 @@ const DiagnosisEngine: React.FC = () => {
             </div>
             <div>
               <span style={{ fontSize: '0.92rem', fontWeight: 600, color: 'var(--text-dark)' }}>Load Market</span>
-              <span style={{ fontSize: '0.75rem', color: 'var(--text-light)', marginLeft: 8 }}>pull real listings for any Denver zip</span>
+              <span style={{ fontSize: '0.75rem', color: 'var(--text-light)', marginLeft: 8 }}>generate synthetic listings for any Denver zip</span>
             </div>
           </div>
 

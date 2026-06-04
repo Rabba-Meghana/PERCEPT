@@ -100,10 +100,10 @@ const RevenueRecovery: React.FC = () => {
           <div className="blob blob-blush" style={{ width: 180, height: 150, right: -30, top: -20, opacity: 0.5 }} />
           <div style={{ position: 'relative', zIndex: 1, maxWidth: 600 }}>
             <div style={{ fontFamily: 'var(--f-display)', fontSize: '1.4rem', color: 'var(--text-dark)', marginBottom: 12, fontStyle: 'italic' }}>
-              "The team had dropped the price three times. The answer was the bathroom photo."
+              "High CTR. Low inquiry. The diagnosis: bathroom lead photo."
             </div>
             <p style={{ fontSize: '0.82rem', color: 'var(--text-mid)', lineHeight: 1.65 }}>
-              PERCEPT diagnosed a perception problem on a Denver 2bd that had been on the market 38 days through 3 price drops. Reordering the lead photo resolved the inquiry gap without touching price — recovering $2,400 in annual revenue.
+              A simulated Denver 2bd with 38 days on market and 3 price drops. PERCEPT diagnosed a perception problem — not price resistance. The pipeline identified the bathroom lead photo as the trust-breaking signal and recommended a photo reorder before any price change.
             </p>
           </div>
         </div>

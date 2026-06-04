@@ -7,12 +7,12 @@ interface Signal {
 }
 
 const SIGNALS: Signal[] = [
-  { name: 'MLS Comp Feed', source: 'CoreLogic API v3', freshness: 97, lastUpdated: '4 min ago', status: 'live', records: '12,440 comps', impact: 'Comp pricing · Demand velocity' },
-  { name: 'Demand Velocity Index', source: 'Internal clickstream', freshness: 100, lastUpdated: 'Live', status: 'live', records: '2.1M events/day', impact: 'Demand score · Timing engine' },
-  { name: 'Behavioral Exhaust', source: 'Platform event bus', freshness: 100, lastUpdated: 'Live', status: 'live', records: '847K interactions', impact: 'Perception gap · Audience signal' },
-  { name: 'Vacancy Risk Model', source: 'Internal ML pipeline', freshness: 88, lastUpdated: '2 hrs ago', status: 'live', records: '2,714 units scored', impact: 'Urgency weighting · Threshold' },
-  { name: 'Neighborhood Sentiment', source: 'Public records + NLP', freshness: 61, lastUpdated: '18 hrs ago', status: 'degraded', records: '340 zip codes', impact: 'Context signal · Weak weight' },
-  { name: 'Legacy Comp Cache', source: 'Internal DB (stale)', freshness: 23, lastUpdated: '3 days ago', status: 'stale', records: '8,200 records', impact: 'EXCLUDED from active diagnosis' },
+  { name: 'Market Profile Engine', source: 'Synthetic · Denver zip profiles', freshness: 100, lastUpdated: 'Per request', status: 'live', records: '8 zip codes', impact: 'Base rent · Demand trend · Vacancy rate' },
+  { name: 'Listing Generator', source: 'LLM-generated · Groq llama3-70b', freshness: 100, lastUpdated: 'Live', status: 'live', records: '8 listings per zip', impact: 'Price · DOM · Behavioral signals' },
+  { name: 'Behavioral Signal Model', source: 'Synthetic · Realistic distributions', freshness: 100, lastUpdated: 'Per listing', status: 'live', records: 'CTR · Inquiry · Save · Tour', impact: 'Perception gap · Audience signal' },
+  { name: 'Ingest Node', source: 'LangGraph pipeline · Node 1', freshness: 100, lastUpdated: 'Live stream', status: 'live', records: 'Structured signal brief', impact: 'Anomaly detection · FMV gap' },
+  { name: 'Behavioral Node', source: 'LangGraph pipeline · Node 2', freshness: 100, lastUpdated: 'Live stream', status: 'live', records: 'Failure mode analysis', impact: 'Differential diagnosis' },
+  { name: 'Diagnosis Node', source: 'LangGraph pipeline · Node 3', freshness: 100, lastUpdated: 'Live stream', status: 'live', records: 'Root cause + action plan', impact: 'Classification · Revenue impact' },
 ];
 
 const statusConfig = {
@@ -42,9 +42,9 @@ const SignalHealth: React.FC = () => {
             <div className="dot d-sage" style={{ animation: `glow 2s ease-in-out infinite` }} />
             <span style={{ fontSize: '0.72rem', fontWeight: 500, letterSpacing: '0.08em', color: 'var(--text-mid)' }}>SIGNAL HEALTH · LIVE</span>
           </div>
-          <h2 style={{ marginBottom: 12 }}>Data provenance, not just data</h2>
+          <h2 style={{ marginBottom: 12 }}>How the pipeline works</h2>
           <p style={{ color: 'var(--text-mid)', maxWidth: 520, fontSize: '0.9rem' }}>
-            Every diagnosis carries a provenance receipt — which signals fed it, how fresh they were, and what was excluded. The LLM is epistemically honest for the first time.
+            Listings are LLM-generated against real Denver market profiles. The three-node reasoning pipeline — Ingest, Behavioral Analysis, Diagnosis — is real and runs live. Each node streams token by token and feeds its output to the next.
           </p>
         </div>
 
@@ -114,15 +114,14 @@ const SignalHealth: React.FC = () => {
 
         {/* Provenance receipt example */}
         <div className="neu-inset" style={{ marginTop: 24, padding: '22px 26px' }}>
-          <div style={{ fontSize: '0.7rem', fontWeight: 600, letterSpacing: '0.08em', color: 'var(--text-light)', textTransform: 'uppercase', marginBottom: 14 }}>Sample Provenance Receipt · Unit P001</div>
+          <div style={{ fontSize: '0.7rem', fontWeight: 600, letterSpacing: '0.08em', color: 'var(--text-light)', textTransform: 'uppercase', marginBottom: 14 }}>Sample Pipeline Receipt · Unit P001</div>
           <div style={{ fontFamily: 'monospace', fontSize: '0.78rem', color: 'var(--text-mid)', lineHeight: 1.8, background: 'rgba(255,255,255,0.3)', padding: '16px 20px', borderRadius: 'var(--r-md)' }}>
-            <span style={{ color: 'var(--sage-dark)' }}>✓</span> MLS Comp Feed · freshness 97% · 12,440 comps · <span style={{ color: 'var(--sage-dark)' }}>INCLUDED</span><br />
-            <span style={{ color: 'var(--sage-dark)' }}>✓</span> Demand Velocity Index · freshness 100% · live · <span style={{ color: 'var(--sage-dark)' }}>INCLUDED</span><br />
-            <span style={{ color: 'var(--sage-dark)' }}>✓</span> Behavioral Exhaust · freshness 100% · live · <span style={{ color: 'var(--sage-dark)' }}>INCLUDED</span><br />
-            <span style={{ color: '#C8A840' }}>⚠</span> Neighborhood Sentiment · freshness 61% · 18h old · <span style={{ color: '#C8A840' }}>WEIGHTED 0.3×</span><br />
-            <span style={{ color: 'var(--blush-dark)' }}>✗</span> Legacy Comp Cache · freshness 23% · 3 days old · <span style={{ color: 'var(--blush-dark)' }}>EXCLUDED</span><br />
+            <span style={{ color: 'var(--sage-dark)' }}>✓</span> Listing data · LLM-generated · Denver 80205 market profile · <span style={{ color: 'var(--sage-dark)' }}>SYNTHETIC</span><br />
+            <span style={{ color: 'var(--sage-dark)' }}>✓</span> Ingest Node · Groq llama3-70b · separate API call · <span style={{ color: 'var(--sage-dark)' }}>STREAMED</span><br />
+            <span style={{ color: 'var(--sage-dark)' }}>✓</span> Behavioral Node · receives Ingest output · separate API call · <span style={{ color: 'var(--sage-dark)' }}>STREAMED</span><br />
+            <span style={{ color: 'var(--sage-dark)' }}>✓</span> Diagnosis Node · receives Behavioral output · separate API call · <span style={{ color: 'var(--sage-dark)' }}>STREAMED</span><br />
             <br />
-            <span style={{ color: 'var(--blue-dark)', fontWeight: 600 }}>Diagnosis confidence: 91%</span> · 4 of 5 signals fresh · 1 excluded · 1 downweighted
+            <span style={{ color: 'var(--blue-dark)', fontWeight: 600 }}>3 sequential nodes · 3 separate LLM calls · live token streaming</span>
           </div>
         </div>
       </div>
